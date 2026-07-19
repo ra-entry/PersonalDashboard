@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Qt
 
 from core.weather_service import WeatherService
-
 from core.weather_codes import get_weather_description
 
 class WeatherWidget(QLabel):
