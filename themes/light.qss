@@ -1,0 +1,28 @@
+QMainWindow {
+    background-color: #f5f5f5;
+}
+
+QWidget {
+    font-family: Segoe UI;
+    font-size: 11pt;
+}
+
+QLabel {
+    color: #222;
+}
+
+QListWidget {
+    background: white;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QPushButton {
+    padding: 6px;
+    border-radius: 6px;
+}
+
+QPushButton:hover {
+    background-color: #e5e5e5;
+}

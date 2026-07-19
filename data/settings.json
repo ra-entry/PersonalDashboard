@@ -1,0 +1,8 @@
+{
+    "location": "Sandwich, Ontario",
+    "latitude": 42.28,
+    "longitude": -83.08,
+    "units": "Fahrenheit",
+    "theme": "Light",
+    "weather_refresh_minutes": 30
+}
