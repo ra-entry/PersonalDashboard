@@ -40,3 +40,31 @@ class WeatherService:
             "wind": current["wind_speed_10m"],
             "weather_code": current["weather_code"]
         }
+    def get_air_quality(self):
+
+        url = (
+            "https://air-quality-api.open-meteo.com/v1/air-quality"
+            f"?latitude={self.latitude}"
+            f"&longitude={self.longitude}"
+            "&current="
+            "us_aqi,"
+            "pm2_5,"
+            "pm10"
+        )
+
+        response = requests.get(url)
+
+        data = response.json()
+
+        current = data["current"]
+
+        return {
+            "aqi": current["us_aqi"],
+            "pm25": current["pm2_5"],
+            "pm10": current["pm10"]
+        }
+if __name__ == "__main__":
+
+    service = WeatherService()
+
+    print(service.get_air_quality())

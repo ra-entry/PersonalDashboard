@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QSizePolicy
 
 
 class DashboardCard(QWidget):
@@ -24,7 +25,10 @@ class DashboardCard(QWidget):
 
         layout.addWidget(content)
 
-        self.setMinimumSize(250, 200)
+        self.setSizePolicy(
+            QSizePolicy.Expanding,
+            QSizePolicy.Expanding
+        )
 
         self.setStyleSheet("""
             QWidget {

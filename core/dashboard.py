@@ -1,17 +1,11 @@
 from PySide6.QtWidgets import (
     QMainWindow,
-    QWidget,
-    QLabel,
-    QVBoxLayout,
-    QHBoxLayout,
+    QStackedWidget,
 )
 
-from PySide6.QtCore import Qt
-
-from widgets.clock_widget import ClockWidget
-from widgets.weather_widget import WeatherWidget
-from widgets.task_widget import TaskWidget
-from widgets.dashboard_card import DashboardCard
+from pages.home_page import HomePage
+from pages.weather_page import WeatherPage
+from pages.tasks_page import TasksPage
 
 
 class Dashboard(QMainWindow):
@@ -20,39 +14,16 @@ class Dashboard(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Personal Dashboard")
-        self.resize(900, 600)
+        self.resize(900, 800)
 
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        self.pages = QStackedWidget()
 
-        main_layout = QVBoxLayout()
-        top_layout = QHBoxLayout()
-        bottom_layout = QHBoxLayout()
+        self.home_page = HomePage()
+        self.weather_page = WeatherPage()
+        self.tasks_page = TasksPage()
 
-        top_layout.setSpacing(15)
-        bottom_layout.setSpacing(15)
+        self.pages.addWidget(self.home_page)
+        self.pages.addWidget(self.weather_page)
+        self.pages.addWidget(self.tasks_page)
 
-        central_widget.setLayout(main_layout)
-
-        title = QLabel("Personal Dashboard")
-        title.setAlignment(Qt.AlignCenter)
-
-        clock = DashboardCard("🕒 Clock", ClockWidget())
-        weather = DashboardCard("🌤️ Weather", WeatherWidget())
-        tasks = DashboardCard("📝 Tasks", TaskWidget())
-        
-        ##clock = ClockWidget()
-        ##weather = WeatherWidget()
-        ##tasks = TaskWidget()
-
-        main_layout.addWidget(title)
-
-        top_layout.addWidget(clock)
-        top_layout.addWidget(weather)
-
-        bottom_layout.addWidget(tasks)
-
-        main_layout.addLayout(top_layout)
-        main_layout.addLayout(bottom_layout)
-
-        main_layout.setSpacing(15)
+        self.setCentralWidget(self.pages)
