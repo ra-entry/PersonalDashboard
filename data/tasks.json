@@ -8,5 +8,25 @@
         "title": "Workout",
         "priority": "Medium",
         "completed": false
+    },
+    {
+        "title": "Go for a run",
+        "priority": "Medium",
+        "completed": false
+    },
+    {
+        "title": "Read a book",
+        "priority": "Medium",
+        "completed": false
+    },
+    {
+        "title": "go for a run",
+        "priority": "Medium",
+        "completed": false
+    },
+    {
+        "title": "Go for a run",
+        "priority": "Medium",
+        "completed": false
     }
 ]

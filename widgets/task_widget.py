@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
     QInputDialog
 )
 
+from PySide6.QtCore import Qt
+
 import managers
 
 
@@ -18,14 +20,25 @@ class TaskWidget(QWidget):
         layout = QVBoxLayout()
 
         title = QLabel("Today's Tasks")
+        title.setAlignment(Qt.AlignLeft)
 
         self.task_list = QListWidget()
 
-        add_button = QPushButton("Add Task")
+        self.task_list.setMaximumHeight(120)
+
+        self.task_list.setVerticalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff
+        )
+
+        self.task_list.setSpacing(5)
+
+
+        add_button = QPushButton("+ Add Task")
 
         add_button.clicked.connect(
             self.add_task
         )
+
 
         layout.addWidget(title)
         layout.addWidget(self.task_list)
@@ -34,7 +47,6 @@ class TaskWidget(QWidget):
         self.setLayout(layout)
 
 
-        # Listen for task changes
         managers.task_manager.tasks_updated.connect(
             self.refresh_tasks
         )
@@ -49,10 +61,24 @@ class TaskWidget(QWidget):
 
         tasks = managers.task_manager.get_active_tasks()
 
-        for task in tasks:
+
+        max_display = 3
+
+
+        for task in tasks[:max_display]:
 
             self.task_list.addItem(
-                task["title"]
+                "☐ " + task["title"]
+            )
+
+
+        remaining = len(tasks) - max_display
+
+
+        if remaining > 0:
+
+            self.task_list.addItem(
+                f"+ {remaining} more tasks..."
             )
 
 
@@ -63,6 +89,7 @@ class TaskWidget(QWidget):
             "New Task",
             "Task:"
         )
+
 
         if ok and task:
 

@@ -70,7 +70,6 @@ class TaskManager(QObject):
             }
         )
 
-
         self.save_tasks()
 
         self.tasks_updated.emit()

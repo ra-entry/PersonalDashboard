@@ -1,8 +1,9 @@
-import sys
-
 from PySide6.QtWidgets import QApplication
+
 from core.dashboard import Dashboard
 from managers import initialize_managers
+
+import sys
 
 app = QApplication(sys.argv)
 

@@ -18,6 +18,40 @@ class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.setStyleSheet("""
+            QWidget {
+            color: #222222;
+            font-size: 14px;
+            }
+
+        QLabel {
+            color: #222222;
+        }
+
+        QPushButton {
+            color: #222222;
+            background-color: #eeeeee;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+
+        QPushButton:hover {
+            background-color: #dddddd;
+        }
+
+        QListWidget {
+            color: #222222;
+            background-color: white;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+        }
+
+        QListWidget::item {
+            padding: 5px;
+        }
+    """)
+        
         self.setWindowTitle("Personal Dashboard")
         self.resize(900, 800)
 
