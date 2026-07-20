@@ -24,6 +24,16 @@ class WeatherService:
             "relative_humidity_2m,"
             "wind_speed_10m,"
             "weather_code,"
+            "&hourly="
+            "temperature_2m,"
+            "precipitation_probability,"
+            "weather_code,"
+            "&daily="
+            "temperature_2m_max,"
+            "temperature_2m_min,"
+            "weather_code,"
+            "sunrise,"
+            "sunset,"
             "&temperature_unit=fahrenheit"
         )
 
@@ -38,7 +48,11 @@ class WeatherService:
             "feels_like": current["apparent_temperature"],
             "humidity": current["relative_humidity_2m"],
             "wind": current["wind_speed_10m"],
-            "weather_code": current["weather_code"]
+            "weather_code": current["weather_code"],
+
+            "hourly": data["hourly"],
+
+            "daily": data["daily"]
         }
     def get_air_quality(self):
 
@@ -67,4 +81,4 @@ if __name__ == "__main__":
 
     service = WeatherService()
 
-    print(service.get_air_quality())
+    print(service.get_weather())

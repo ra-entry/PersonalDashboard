@@ -1,6 +1,3 @@
-import json
-import os
-
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -10,14 +7,13 @@ from PySide6.QtWidgets import (
     QInputDialog
 )
 
+import managers
+
 
 class TaskWidget(QWidget):
+
     def __init__(self):
         super().__init__()
-
-        self.file_path = "data/tasks.json"
-
-        self.tasks = self.load_tasks()
 
         layout = QVBoxLayout()
 
@@ -27,7 +23,9 @@ class TaskWidget(QWidget):
 
         add_button = QPushButton("Add Task")
 
-        add_button.clicked.connect(self.add_task)
+        add_button.clicked.connect(
+            self.add_task
+        )
 
         layout.addWidget(title)
         layout.addWidget(self.task_list)
@@ -35,37 +33,27 @@ class TaskWidget(QWidget):
 
         self.setLayout(layout)
 
+
+        # Listen for task changes
+        managers.task_manager.tasks_updated.connect(
+            self.refresh_tasks
+        )
+
+
         self.refresh_tasks()
-
-
-    def load_tasks(self):
-
-        if os.path.exists(self.file_path):
-
-            with open(self.file_path, "r") as file:
-                return json.load(file)
-
-        return []
-
-
-    def save_tasks(self):
-
-        os.makedirs("data", exist_ok=True)
-
-        with open(self.file_path, "w") as file:
-            json.dump(
-                self.tasks,
-                file,
-                indent=4
-            )
 
 
     def refresh_tasks(self):
 
         self.task_list.clear()
 
-        for task in self.tasks:
-            self.task_list.addItem(task)
+        tasks = managers.task_manager.get_active_tasks()
+
+        for task in tasks:
+
+            self.task_list.addItem(
+                task["title"]
+            )
 
 
     def add_task(self):
@@ -78,8 +66,4 @@ class TaskWidget(QWidget):
 
         if ok and task:
 
-            self.tasks.append(task)
-
-            self.save_tasks()
-
-            self.refresh_tasks()
+            managers.task_manager.add_task(task)

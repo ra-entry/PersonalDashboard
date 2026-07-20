@@ -13,17 +13,17 @@ class DashboardCard(QWidget):
     def __init__(self, title: str, content: QWidget):
         super().__init__()
 
-        layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout(self)
 
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(10)
+        self.layout.setContentsMargins(10, 10, 10, 10)
+        self.layout.setSpacing(10)
 
         title_label = QLabel(title)
         title_label.setAlignment(Qt.AlignCenter)
 
-        layout.addWidget(title_label)
+        self.layout.addWidget(title_label)
 
-        layout.addWidget(content)
+        self.layout.addWidget(content)
 
         self.setSizePolicy(
             QSizePolicy.Expanding,
@@ -31,7 +31,7 @@ class DashboardCard(QWidget):
         )
 
         self.setStyleSheet("""
-            QWidget {
+            DashboardCard {
                 background-color: white;
                 border: 1px solid #bbbbbb;
                 border-radius: 10px;
@@ -42,3 +42,5 @@ class DashboardCard(QWidget):
                 background: transparent;
             }
         """)
+    def add_widget(self, widget):
+        self.layout.addWidget(widget)
