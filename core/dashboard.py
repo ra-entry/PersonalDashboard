@@ -14,6 +14,24 @@ from pages.settings_page import SettingsPage
 
 class Dashboard(QMainWindow):
 
+    def set_active_button(self, active_button):
+
+        buttons = [
+            self.home_button,
+            self.weather_button,
+            self.tasks_button,
+            self.settings_button,
+        ]
+
+        for button in buttons:
+            button.setProperty("active", False)
+
+        active_button.setProperty("active", True)
+
+        for button in buttons:
+            button.style().unpolish(button)
+            button.style().polish(button)
+    
     def __init__(self):
         super().__init__()
 
@@ -30,10 +48,10 @@ class Dashboard(QMainWindow):
         self.settings_page = SettingsPage()
 
         # Create buttons
-        home_button = QPushButton("🏠 Home")
-        weather_button = QPushButton("🌤 Weather")
-        tasks_button = QPushButton("📝 Tasks")
-        settings_button = QPushButton("⚙ Settings")
+        self.home_button = QPushButton("🏠 Home")
+        self.weather_button = QPushButton("🌤 Weather")
+        self.tasks_button = QPushButton("📝 Tasks")
+        self.settings_button = QPushButton("⚙ Settings")
         
         # Add pages to stack
         self.pages.addWidget(self.home_page)
@@ -42,20 +60,32 @@ class Dashboard(QMainWindow):
         self.pages.addWidget(self.settings_page)
 
         # Connect buttons  <-- Step 5 goes here
-        home_button.clicked.connect(
-            lambda: self.pages.setCurrentWidget(self.home_page)
+        self.home_button.clicked.connect(
+            lambda: (
+                self.pages.setCurrentWidget(self.home_page),
+                self.set_active_button(self.home_button)
+    )
         )
 
-        weather_button.clicked.connect(
-            lambda: self.pages.setCurrentWidget(self.weather_page)
+        self.weather_button.clicked.connect(
+            lambda: (
+                self.pages.setCurrentWidget(self.weather_page),
+                self.set_active_button(self.weather_button)
+            )
         )
 
-        tasks_button.clicked.connect(
-            lambda: self.pages.setCurrentWidget(self.tasks_page)
+        self.tasks_button.clicked.connect(
+            lambda: (
+                self.pages.setCurrentWidget(self.tasks_page),
+                self.set_active_button(self.tasks_button)
+            )
         )
 
-        settings_button.clicked.connect(
-            lambda: self.pages.setCurrentWidget(self.settings_page)
+        self.settings_button.clicked.connect(
+            lambda: (
+                self.pages.setCurrentWidget(self.settings_page),
+                self.set_active_button(self.settings_button)
+            )
         )
 
         # Build layout
@@ -66,10 +96,10 @@ class Dashboard(QMainWindow):
         sidebar.setSpacing(10)
 
         for button in [
-            home_button,
-            weather_button,
-            tasks_button,
-            settings_button
+            self.home_button,
+            self.weather_button,
+            self.tasks_button,
+            self.settings_button
         ]:
             button.setFixedWidth(160)
             button.setStyleSheet(
@@ -81,10 +111,10 @@ class Dashboard(QMainWindow):
                 """
             )
 
-        sidebar.addWidget(home_button)
-        sidebar.addWidget(weather_button)
-        sidebar.addWidget(tasks_button)
-        sidebar.addWidget(settings_button)
+        sidebar.addWidget(self.home_button)
+        sidebar.addWidget(self.weather_button)
+        sidebar.addWidget(self.tasks_button)
+        sidebar.addWidget(self.settings_button)
 
         sidebar.addStretch()
 
@@ -94,3 +124,4 @@ class Dashboard(QMainWindow):
         container.setLayout(main_layout)
 
         self.setCentralWidget(container)
+        self.set_active_button(self.home_button)
