@@ -2,8 +2,8 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QStackedWidget,
     QWidget,
-    QVBoxLayout,
     QHBoxLayout,
+    QVBoxLayout,
     QPushButton,
 )
 
@@ -29,19 +29,17 @@ class Dashboard(QMainWindow):
         self.tasks_page = TasksPage()
         self.settings_page = SettingsPage()
 
+        # Create buttons
+        home_button = QPushButton("🏠 Home")
+        weather_button = QPushButton("🌤 Weather")
+        tasks_button = QPushButton("📝 Tasks")
+        settings_button = QPushButton("⚙ Settings")
+        
         # Add pages to stack
         self.pages.addWidget(self.home_page)
         self.pages.addWidget(self.weather_page)
         self.pages.addWidget(self.tasks_page)
         self.pages.addWidget(self.settings_page)
-
-
-        # Create navigation buttons
-        home_button = QPushButton("Home")
-        weather_button = QPushButton("Weather")
-        tasks_button = QPushButton("Tasks")
-        settings_button = QPushButton("Settings")
-
 
         # Connect buttons  <-- Step 5 goes here
         home_button.clicked.connect(
@@ -60,19 +58,37 @@ class Dashboard(QMainWindow):
             lambda: self.pages.setCurrentWidget(self.settings_page)
         )
 
-
         # Build layout
         container = QWidget()
 
-        main_layout = QVBoxLayout()
-        nav_layout = QHBoxLayout()
+        main_layout = QHBoxLayout()
+        sidebar = QVBoxLayout()
+        sidebar.setSpacing(10)
 
-        nav_layout.addWidget(home_button)
-        nav_layout.addWidget(weather_button)
-        nav_layout.addWidget(tasks_button)
-        nav_layout.addWidget(settings_button)
+        for button in [
+            home_button,
+            weather_button,
+            tasks_button,
+            settings_button
+        ]:
+            button.setFixedWidth(160)
+            button.setStyleSheet(
+                """
+                QPushButton {
+                    text-align: left;
+                    padding-left: 15px;
+                }
+                """
+            )
 
-        main_layout.addLayout(nav_layout)
+        sidebar.addWidget(home_button)
+        sidebar.addWidget(weather_button)
+        sidebar.addWidget(tasks_button)
+        sidebar.addWidget(settings_button)
+
+        sidebar.addStretch()
+
+        main_layout.addLayout(sidebar)
         main_layout.addWidget(self.pages)
 
         container.setLayout(main_layout)
