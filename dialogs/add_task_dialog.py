@@ -13,14 +13,28 @@ from PySide6.QtCore import QDate
 
 class AddTaskDialog(QDialog):
 
-    def __init__(self):
+    def __init__(
+        self,
+        task=None,
+        priority="Medium",
+        due_date=None
+    ):
+
         super().__init__()
 
         self.setWindowTitle(
-            "Add Task"
+            "Task"
         )
 
+
         self.task_input = QLineEdit()
+
+
+        if task:
+            self.task_input.setText(
+                task
+            )
+
 
         self.priority_input = QComboBox()
 
@@ -33,15 +47,37 @@ class AddTaskDialog(QDialog):
         )
 
 
+        index = self.priority_input.findText(
+            priority
+        )
+
+        if index >= 0:
+            self.priority_input.setCurrentIndex(
+                index
+            )
+
+
         self.date_input = QDateEdit()
 
         self.date_input.setCalendarPopup(
             True
         )
 
-        self.date_input.setDate(
-            QDate.currentDate()
-        )
+
+        if due_date:
+
+            self.date_input.setDate(
+                QDate.fromString(
+                    due_date,
+                    "yyyy-MM-dd"
+                )
+            )
+
+        else:
+
+            self.date_input.setDate(
+                QDate.currentDate()
+            )
 
 
         form = QFormLayout()
@@ -63,7 +99,7 @@ class AddTaskDialog(QDialog):
 
 
         button = QPushButton(
-            "Add Task"
+            "Save Task"
         )
 
         button.clicked.connect(

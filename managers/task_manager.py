@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 
 from PySide6.QtCore import QObject, Signal
 
@@ -30,7 +31,13 @@ class TaskManager(QObject):
             ) as file:
 
                 self.tasks = json.load(file)
+    
+            for task in self.tasks:
 
+                if "id" not in task:
+
+                    task["id"] = str(uuid.uuid4())
+                
         else:
 
             self.tasks = []
@@ -60,10 +67,16 @@ class TaskManager(QObject):
 
 
 
-    def add_task(self, title, priority, due_date=None):
+    def add_task(
+        self,
+        title,
+        priority,
+        due_date=None
+    ):
 
         self.tasks.append(
             {
+                "id": str(uuid.uuid4()),
                 "title": title,
                 "priority": priority,
                 "due_date": due_date,
@@ -74,40 +87,73 @@ class TaskManager(QObject):
         self.save_tasks()
 
         self.tasks_updated.emit()
-    
-    def complete_task(self, title):
+
+
+
+    def update_task(
+        self,
+        task_id,
+        new_title,
+        priority,
+        due_date
+    ):
 
         for task in self.tasks:
 
-            if task["title"] == title:
+            if task["id"] == task_id:
 
-                task["completed"] = True
+                task["title"] = new_title
+                task["priority"] = priority
+                task["due_date"] = due_date
+
                 break
+
 
         self.save_tasks()
 
         self.tasks_updated.emit()
 
+
+
+    def complete_task(
+        self,
+        task_id
+    ):
+
+        for task in self.tasks:
+
+            if task["id"] == task_id:
+
+                task["completed"] = True
+
+                break
+
+
+        self.save_tasks()
+
+        self.tasks_updated.emit()
+
+
+
     def get_active_tasks(self):
 
-        priority_order = {
-            "High": 0,
-            "Medium": 1,
-            "Low": 2
-        }
-
-
-        active_tasks = [
+        return [
             task
             for task in self.tasks
             if not task["completed"]
         ]
+    def delete_task(
+        self,
+        task_id
+    ):
+
+        self.tasks = [
+            task
+            for task in self.tasks
+            if task["title"] != title
+        ]
 
 
-        return sorted(
-            active_tasks,
-            key=lambda task: priority_order.get(
-                task.get("priority", "Medium"),
-                1
-            )
-        )
+        self.save_tasks()
+
+        self.tasks_updated.emit()
