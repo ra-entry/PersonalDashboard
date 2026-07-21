@@ -2,31 +2,84 @@
     {
         "title": "Finish dashboard",
         "priority": "High",
-        "completed": false
+        "completed": true
     },
     {
         "title": "Workout",
         "priority": "Medium",
-        "completed": false
+        "completed": true
     },
     {
         "title": "Go for a run",
         "priority": "Medium",
-        "completed": false
+        "completed": true
     },
     {
         "title": "Read a book",
         "priority": "Medium",
-        "completed": false
+        "completed": true
     },
     {
         "title": "go for a run",
         "priority": "Medium",
-        "completed": false
+        "completed": true
     },
     {
         "title": "Go for a run",
         "priority": "Medium",
+        "completed": false
+    },
+    {
+        "title": "Finish Dashboard",
+        "priority": "High",
+        "completed": true
+    },
+    {
+        "title": "Finish dashboard",
+        "priority": "High",
+        "completed": false
+    },
+    {
+        "title": "Clean room",
+        "priority": "Low",
+        "completed": true
+    },
+    {
+        "title": "Clean my room",
+        "priority": "Low",
+        "completed": true
+    },
+    {
+        "title": "Go to the dentist",
+        "priority": "High",
+        "completed": true
+    },
+    {
+        "title": "Buy groceries",
+        "priority": "Medium",
+        "completed": false
+    },
+    {
+        "title": "Review pay with work",
+        "priority": "High",
+        "completed": true
+    },
+    {
+        "title": "Finish the dashboard",
+        "priority": "High",
+        "due_date": "2026-07-23",
+        "completed": false
+    },
+    {
+        "title": "Test due date",
+        "priority": "High",
+        "due_date": "2026-07-20",
+        "completed": false
+    },
+    {
+        "title": "Testing the dashboard",
+        "priority": "High",
+        "due_date": "2026-07-21",
         "completed": false
     }
 ]

@@ -60,12 +60,13 @@ class TaskManager(QObject):
 
 
 
-    def add_task(self, title):
+    def add_task(self, title, priority, due_date=None):
 
         self.tasks.append(
             {
                 "title": title,
-                "priority": "Medium",
+                "priority": priority,
+                "due_date": due_date,
                 "completed": False
             }
         )
@@ -73,13 +74,40 @@ class TaskManager(QObject):
         self.save_tasks()
 
         self.tasks_updated.emit()
+    
+    def complete_task(self, title):
 
+        for task in self.tasks:
 
+            if task["title"] == title:
+
+                task["completed"] = True
+                break
+
+        self.save_tasks()
+
+        self.tasks_updated.emit()
 
     def get_active_tasks(self):
 
-        return [
+        priority_order = {
+            "High": 0,
+            "Medium": 1,
+            "Low": 2
+        }
+
+
+        active_tasks = [
             task
             for task in self.tasks
             if not task["completed"]
         ]
+
+
+        return sorted(
+            active_tasks,
+            key=lambda task: priority_order.get(
+                task.get("priority", "Medium"),
+                1
+            )
+        )
