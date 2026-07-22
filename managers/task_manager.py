@@ -37,6 +37,10 @@ class TaskManager(QObject):
                 if "id" not in task:
 
                     task["id"] = str(uuid.uuid4())
+
+                if "category" not in task:
+
+                    task["category"] = "Personal"
                 
         else:
 
@@ -71,6 +75,7 @@ class TaskManager(QObject):
         self,
         title,
         priority,
+        category,
         due_date=None
     ):
 
@@ -79,6 +84,7 @@ class TaskManager(QObject):
                 "id": str(uuid.uuid4()),
                 "title": title,
                 "priority": priority,
+                "category": category,
                 "due_date": due_date,
                 "completed": False
             }
@@ -95,6 +101,7 @@ class TaskManager(QObject):
         task_id,
         new_title,
         priority,
+        category,
         due_date
     ):
 
@@ -104,6 +111,7 @@ class TaskManager(QObject):
 
                 task["title"] = new_title.strip()
                 task["priority"] = priority
+                task["category"] = category
                 task["due_date"] = due_date
 
                 break

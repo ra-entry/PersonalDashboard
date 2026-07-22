@@ -3,117 +3,143 @@
         "title": "Workout",
         "priority": "Medium",
         "completed": true,
-        "id": "b32b1fdb-c6e8-42a2-8333-a901244e7dd3"
+        "id": "b32b1fdb-c6e8-42a2-8333-a901244e7dd3",
+        "category": "Personal"
     },
     {
         "title": "Went for a run",
         "priority": "Low",
         "completed": true,
         "due_date": "2026-07-20",
-        "id": "df94d8e7-db97-43dc-9fcd-0aa1523583fb"
+        "id": "df94d8e7-db97-43dc-9fcd-0aa1523583fb",
+        "category": "Personal"
     },
     {
         "title": "Read a book",
         "priority": "Medium",
         "completed": true,
-        "id": "ff24d390-ab6f-402c-b387-2e53405dc6b9"
+        "id": "ff24d390-ab6f-402c-b387-2e53405dc6b9",
+        "category": "Personal"
     },
     {
         "title": "go for a run",
         "priority": "Medium",
         "completed": true,
-        "id": "d538b5a7-2802-49c9-9b9e-3ad0fdfdf727"
+        "id": "d538b5a7-2802-49c9-9b9e-3ad0fdfdf727",
+        "category": "Personal"
     },
     {
         "title": "Go for a run",
         "priority": "Medium",
         "completed": true,
-        "id": "cd52f573-aab2-4530-9002-e6ae9412f7fc"
+        "id": "cd52f573-aab2-4530-9002-e6ae9412f7fc",
+        "category": "Personal"
     },
     {
         "title": "Finish Dashboard",
         "priority": "High",
         "completed": true,
-        "id": "5a165e5f-aaaa-4687-8010-8e8a6296a3dd"
+        "id": "5a165e5f-aaaa-4687-8010-8e8a6296a3dd",
+        "category": "Personal"
     },
     {
         "title": "Clean room",
         "priority": "Low",
         "completed": true,
-        "id": "4bcadccf-e3d9-4570-8880-b4629ba67986"
+        "id": "4bcadccf-e3d9-4570-8880-b4629ba67986",
+        "category": "Personal"
     },
     {
         "title": "Clean my room",
         "priority": "Low",
         "completed": true,
-        "id": "abac34f4-3866-4c3b-b534-0de616fcc0df"
+        "id": "abac34f4-3866-4c3b-b534-0de616fcc0df",
+        "category": "Personal"
     },
     {
         "title": "Go to the dentist",
         "priority": "High",
         "completed": true,
-        "id": "bb2ccedb-a911-49f2-ac71-ca442df8d262"
+        "id": "bb2ccedb-a911-49f2-ac71-ca442df8d262",
+        "category": "Personal"
     },
     {
         "title": "Buy groceries",
         "priority": "Medium",
         "completed": true,
         "due_date": "2026-07-21",
-        "id": "9e17553b-3224-4dee-ac6f-ebfebd3396e2"
+        "id": "9e17553b-3224-4dee-ac6f-ebfebd3396e2",
+        "category": "Personal"
     },
     {
         "title": "Review pay with work",
         "priority": "High",
         "completed": true,
-        "id": "81c4ff58-654f-4f09-b8f1-f017bec8287e"
+        "id": "81c4ff58-654f-4f09-b8f1-f017bec8287e",
+        "category": "Personal"
     },
     {
         "title": "Finish the dashboard",
         "priority": "High",
         "due_date": "2026-07-23",
         "completed": true,
-        "id": "e9009871-397a-43ea-9a6a-30d6cd2db6c1"
+        "id": "e9009871-397a-43ea-9a6a-30d6cd2db6c1",
+        "category": "Personal"
     },
     {
         "title": "Test due date",
         "priority": "High",
         "due_date": "2026-07-20",
         "completed": true,
-        "id": "f6c0b19e-40f5-4be8-8079-b23308ce0e7c"
+        "id": "f6c0b19e-40f5-4be8-8079-b23308ce0e7c",
+        "category": "Personal"
     },
     {
         "title": "Testing the dashboard",
         "priority": "High",
         "due_date": "2026-07-21",
         "completed": true,
-        "id": "ee1e08c4-cce1-4906-9a12-678438723901"
+        "id": "ee1e08c4-cce1-4906-9a12-678438723901",
+        "category": "Personal"
     },
     {
         "title": "Get some sun",
         "priority": "Low",
         "due_date": "2026-07-21",
         "completed": true,
-        "id": "f0a0912e-f2af-475c-b5b2-a41631e4fc1c"
+        "id": "f0a0912e-f2af-475c-b5b2-a41631e4fc1c",
+        "category": "Personal"
     },
     {
         "id": "1341b44c-a5aa-4702-a7ab-4049fff33ea9",
         "title": "Task A",
         "priority": "Medium",
         "due_date": "2026-07-22",
-        "completed": true
+        "completed": true,
+        "category": "Personal"
     },
     {
         "id": "079305d6-cf01-4d8d-81c4-f20984393e21",
         "title": "Task ABC",
         "priority": "Medium",
         "due_date": "2026-07-24",
-        "completed": true
+        "completed": true,
+        "category": "Personal"
     },
     {
         "id": "61e9d41c-4873-488c-87b4-a0fb5e578dad",
         "title": "Brush teeth",
         "priority": "Medium",
         "due_date": "2026-07-22",
-        "completed": true
+        "completed": true,
+        "category": "Personal"
+    },
+    {
+        "id": "6e76871d-5105-4eba-8795-44d29c32f87f",
+        "title": "Testing 1.5",
+        "priority": "Low",
+        "category": "Work",
+        "due_date": "2026-07-22",
+        "completed": false
     }
 ]

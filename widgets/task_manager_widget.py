@@ -427,6 +427,16 @@ class TaskManagerWidget(QWidget):
             f"{icon} {task['title']}"
         )
 
+        category = task.get(
+            "category",
+            "Personal"
+        )
+
+
+        text += (
+            f"\n    {category}"
+        )
+
 
         due_text = get_due_description(
             task.get("due_date")
@@ -469,7 +479,7 @@ class TaskManagerWidget(QWidget):
 
         if dialog.exec():
 
-            task, priority, due_date = (
+            task, priority, category, due_date = (
                 dialog.get_task_data()
             )
 
@@ -479,6 +489,7 @@ class TaskManagerWidget(QWidget):
                 managers.task_manager.add_task(
                     task,
                     priority,
+                    category,
                     due_date
                 )
 
@@ -519,6 +530,10 @@ class TaskManagerWidget(QWidget):
                 "Medium"
             ),
             task.get(
+                "category",
+                "Personal"
+            ),
+            task.get(
                 "due_date"
             )
         )
@@ -526,7 +541,7 @@ class TaskManagerWidget(QWidget):
 
         if dialog.exec():
 
-            new_title, priority, due_date = (
+            new_title, priority, category, due_date = (
                 dialog.get_task_data()
             )
 
@@ -535,6 +550,7 @@ class TaskManagerWidget(QWidget):
                 task_id,
                 new_title,
                 priority,
+                category,
                 due_date
             )
 

@@ -250,7 +250,7 @@ class TaskWidget(QWidget):
 
         if dialog.exec():
 
-            task, priority, due_date = (
+            task, priority, category, due_date = (
                 dialog.get_task_data()
             )
 
@@ -260,6 +260,7 @@ class TaskWidget(QWidget):
                 managers.task_manager.add_task(
                     task,
                     priority,
+                    category,
                     due_date
                 )
 
@@ -304,6 +305,10 @@ class TaskWidget(QWidget):
                 "Medium"
             ),
             task.get(
+                "category",
+                "Personal"
+            ),
+            task.get(
                 "due_date"
             )
         )
@@ -312,15 +317,15 @@ class TaskWidget(QWidget):
 
         if dialog.exec():
 
-            new_title, priority, due_date = (
+            new_title, priority, category, due_date = (
                 dialog.get_task_data()
             )
-
 
             managers.task_manager.update_task(
                 task_id,
                 new_title,
                 priority,
+                category,
                 due_date
             )
     def show_task_menu(self, position):

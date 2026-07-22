@@ -17,6 +17,7 @@ class AddTaskDialog(QDialog):
         self,
         task=None,
         priority="Medium",
+        category="Personal",
         due_date=None
     ):
 
@@ -56,6 +57,28 @@ class AddTaskDialog(QDialog):
                 index
             )
 
+        self.category_input = QComboBox()
+
+        self.category_input.addItems(
+            [
+                "Personal",
+                "Work",
+                "Health",
+                "Home",
+                "Projects",
+                "Errands"
+            ]
+        )
+
+        category_index = self.category_input.findText(
+            category
+        )
+
+        if category_index >= 0:
+
+            self.category_input.setCurrentIndex(
+                category_index
+            )
 
         self.date_input = QDateEdit()
 
@@ -90,6 +113,11 @@ class AddTaskDialog(QDialog):
         form.addRow(
             "Priority:",
             self.priority_input
+        )
+
+        form.addRow(
+            "Category:",
+            self.category_input
         )
 
         form.addRow(
@@ -130,6 +158,8 @@ class AddTaskDialog(QDialog):
             self.task_input.text(),
 
             self.priority_input.currentText(),
+
+            self.category_input.currentText(),
 
             self.date_input.date().toString(
                 "yyyy-MM-dd"
