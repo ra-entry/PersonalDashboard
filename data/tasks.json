@@ -98,15 +98,22 @@
     {
         "id": "1341b44c-a5aa-4702-a7ab-4049fff33ea9",
         "title": "Task A",
-        "priority": "High",
-        "due_date": "2026-07-21",
-        "completed": false
+        "priority": "Medium",
+        "due_date": "2026-07-22",
+        "completed": true
     },
     {
         "id": "079305d6-cf01-4d8d-81c4-f20984393e21",
-        "title": "Task A ",
-        "priority": "Low",
-        "due_date": "2026-07-21",
+        "title": "Task ABC",
+        "priority": "Medium",
+        "due_date": "2026-07-23",
+        "completed": false
+    },
+    {
+        "id": "61e9d41c-4873-488c-87b4-a0fb5e578dad",
+        "title": "Brush teeth",
+        "priority": "Medium",
+        "due_date": "2026-07-22",
         "completed": false
     }
 ]

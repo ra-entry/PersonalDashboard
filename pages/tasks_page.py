@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import (
     QWidget,
-    QLabel,
     QVBoxLayout
 )
+
+from widgets.task_manager_widget import TaskManagerWidget
 
 
 class TasksPage(QWidget):
@@ -12,10 +13,8 @@ class TasksPage(QWidget):
 
         layout = QVBoxLayout()
 
-        label = QLabel(
-            "Task Management Coming Soon"
+        layout.addWidget(
+            TaskManagerWidget()
         )
-
-        layout.addWidget(label)
 
         self.setLayout(layout)

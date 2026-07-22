@@ -102,7 +102,7 @@ class TaskManager(QObject):
 
             if task["id"] == task_id:
 
-                task["title"] = new_title
+                task["title"] = new_title.strip()
                 task["priority"] = priority
                 task["due_date"] = due_date
 
@@ -150,7 +150,7 @@ class TaskManager(QObject):
         self.tasks = [
             task
             for task in self.tasks
-            if task["title"] != title
+            if task["id"] != task_id
         ]
 
 
