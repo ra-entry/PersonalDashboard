@@ -6,7 +6,7 @@
         "id": "b32b1fdb-c6e8-42a2-8333-a901244e7dd3"
     },
     {
-        "title": "Go for a run",
+        "title": "Went for a run",
         "priority": "Low",
         "completed": true,
         "due_date": "2026-07-20",
@@ -27,7 +27,7 @@
     {
         "title": "Go for a run",
         "priority": "Medium",
-        "completed": false,
+        "completed": true,
         "id": "cd52f573-aab2-4530-9002-e6ae9412f7fc"
     },
     {

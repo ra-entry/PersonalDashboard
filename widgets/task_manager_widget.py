@@ -22,8 +22,9 @@ class TaskManagerWidget(QWidget):
 
         layout = QVBoxLayout()
 
+
         title = QLabel(
-            "All Tasks"
+            "Task Management"
         )
 
         title.setStyleSheet("""
@@ -31,9 +32,35 @@ class TaskManagerWidget(QWidget):
             font-weight: bold;
         """)
 
-        self.task_list = QListWidget()
 
-        self.task_list.setSpacing(5)
+        active_label = QLabel(
+            "Active Tasks"
+        )
+
+        active_label.setStyleSheet("""
+            font-weight: bold;
+        """)
+
+
+        self.active_task_list = QListWidget()
+
+        self.active_task_list.setSpacing(5)
+
+
+
+        completed_label = QLabel(
+            "Completed Tasks"
+        )
+
+        completed_label.setStyleSheet("""
+            font-weight: bold;
+        """)
+
+
+        self.completed_task_list = QListWidget()
+
+        self.completed_task_list.setSpacing(5)
+
 
 
         add_button = QPushButton(
@@ -45,11 +72,20 @@ class TaskManagerWidget(QWidget):
         )
 
 
+
         layout.addWidget(title)
-        layout.addWidget(self.task_list)
+
+        layout.addWidget(active_label)
+        layout.addWidget(self.active_task_list)
+
+        layout.addWidget(completed_label)
+        layout.addWidget(self.completed_task_list)
+
         layout.addWidget(add_button)
 
+
         self.setLayout(layout)
+
 
 
         managers.task_manager.tasks_updated.connect(
@@ -57,19 +93,37 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        self.task_list.itemDoubleClicked.connect(
+
+        # Active task interactions
+
+        self.active_task_list.itemDoubleClicked.connect(
             self.edit_task
         )
 
-
-        self.task_list.setContextMenuPolicy(
+        self.active_task_list.setContextMenuPolicy(
             Qt.CustomContextMenu
         )
 
-
-        self.task_list.customContextMenuRequested.connect(
+        self.active_task_list.customContextMenuRequested.connect(
             self.show_task_menu
         )
+
+
+
+        # Completed task interactions
+
+        self.completed_task_list.itemDoubleClicked.connect(
+            self.edit_task
+        )
+
+        self.completed_task_list.setContextMenuPolicy(
+            Qt.CustomContextMenu
+        )
+
+        self.completed_task_list.customContextMenuRequested.connect(
+            self.show_task_menu
+        )
+
 
 
         self.refresh_tasks()
@@ -78,15 +132,56 @@ class TaskManagerWidget(QWidget):
 
     def refresh_tasks(self):
 
-        self.task_list.clear()
+        self.active_task_list.clear()
+
+        self.completed_task_list.clear()
 
 
-        tasks = managers.task_manager.get_active_tasks()
+
+        active_tasks = (
+            managers.task_manager.get_active_tasks()
+        )
 
 
-        for task in tasks:
+        completed_tasks = (
+            managers.task_manager.get_completed_tasks()
+        )
 
-            priority_icon = {
+
+
+        for task in active_tasks:
+
+            self.add_task_item(
+                self.active_task_list,
+                task
+            )
+
+
+
+        for task in completed_tasks:
+
+            self.add_task_item(
+                self.completed_task_list,
+                task,
+                completed=True
+            )
+
+
+
+    def add_task_item(
+        self,
+        list_widget,
+        task,
+        completed=False
+    ):
+
+        if completed:
+
+            icon = "✓"
+
+        else:
+
+            icon = {
                 "High": "🔴",
                 "Medium": "🟡",
                 "Low": "🟢"
@@ -96,38 +191,38 @@ class TaskManagerWidget(QWidget):
             )
 
 
-            due_text = get_due_description(
-                task.get("due_date")
+
+        text = (
+            f"{icon} {task['title']}"
+        )
+
+
+        due_text = get_due_description(
+            task.get("due_date")
+        )
+
+
+        if due_text and not completed:
+
+            text += (
+                f"\n    {due_text}"
             )
 
 
-            text = (
-                f"{priority_icon} {task['title']}"
-            )
+        item = QListWidgetItem(
+            text
+        )
 
 
-            if due_text:
-
-                text += (
-                    f"\n    {due_text}"
-                )
-
-
-            item = QListWidgetItem(
-                text
-            )
+        item.setData(
+            Qt.UserRole,
+            task["id"]
+        )
 
 
-            # Store unique task ID
-            item.setData(
-                Qt.UserRole,
-                task["id"]
-            )
-
-
-            self.task_list.addItem(
-                item
-            )
+        list_widget.addItem(
+            item
+        )
 
 
 
@@ -163,12 +258,6 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        if task_id is None:
-
-            return
-
-
-
         task = next(
             (
                 t
@@ -183,12 +272,6 @@ class TaskManagerWidget(QWidget):
 
             return
 
-
-
-        print(
-            "OPENING EDIT:",
-            task
-        )
 
 
         from dialogs.add_task_dialog import AddTaskDialog
@@ -214,14 +297,6 @@ class TaskManagerWidget(QWidget):
             )
 
 
-            print(
-                "EDIT RESULT:",
-                new_title,
-                priority,
-                due_date
-            )
-
-
             managers.task_manager.update_task(
                 task_id,
                 new_title,
@@ -233,7 +308,10 @@ class TaskManagerWidget(QWidget):
 
     def show_task_menu(self, position):
 
-        item = self.task_list.itemAt(
+        sender = self.sender()
+
+
+        item = sender.itemAt(
             position
         )
 
@@ -248,12 +326,6 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        if task_id is None:
-
-            return
-
-
-
         menu = QMenu()
 
 
@@ -261,22 +333,18 @@ class TaskManagerWidget(QWidget):
             "✏ Edit Task"
         )
 
-
         complete_action = menu.addAction(
             "✓ Complete Task"
         )
-
 
         delete_action = menu.addAction(
             "🗑 Delete Task"
         )
 
 
-
         action = menu.exec(
-            self.task_list.mapToGlobal(position)
+            sender.mapToGlobal(position)
         )
-
 
 
         if action == edit_action:
@@ -284,13 +352,11 @@ class TaskManagerWidget(QWidget):
             self.edit_task(item)
 
 
-
         elif action == complete_action:
 
             managers.task_manager.complete_task(
                 task_id
             )
-
 
 
         elif action == delete_action:

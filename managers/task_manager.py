@@ -142,6 +142,15 @@ class TaskManager(QObject):
             for task in self.tasks
             if not task["completed"]
         ]
+
+    def get_completed_tasks(self):
+
+        return [
+            task
+            for task in self.tasks
+            if task["completed"]
+        ]
+    
     def delete_task(
         self,
         task_id
@@ -157,3 +166,4 @@ class TaskManager(QObject):
         self.save_tasks()
 
         self.tasks_updated.emit()
+
