@@ -150,6 +150,10 @@ class TaskManager(QObject):
             for task in self.tasks
             if task["completed"]
         ]
+
+    def get_all_tasks(self):
+
+        return self.tasks
     
     def delete_task(
         self,

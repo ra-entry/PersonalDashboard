@@ -5,7 +5,9 @@ from PySide6.QtWidgets import (
     QPushButton,
     QListWidget,
     QListWidgetItem,
-    QMenu
+    QMenu,
+    QComboBox,
+    QHBoxLayout
 )
 
 from PySide6.QtCore import Qt
@@ -33,6 +35,62 @@ class TaskManagerWidget(QWidget):
         """)
 
 
+        controls_layout = QHBoxLayout()
+
+
+        sort_label = QLabel(
+            "Sort:"
+        )
+
+        self.sort_box = QComboBox()
+
+        self.sort_box.addItems(
+            [
+                "Default",
+                "Priority",
+                "Due Date"
+            ]
+        )
+
+
+        filter_label = QLabel(
+            "Filter:"
+        )
+
+        self.filter_box = QComboBox()
+
+        self.filter_box.addItems(
+            [
+                "All",
+                "High Priority",
+                "Medium Priority",
+                "Low Priority",
+                "Due Today"
+            ]
+        )
+
+
+        controls_layout.addWidget(
+            sort_label
+        )
+
+        controls_layout.addWidget(
+            self.sort_box
+        )
+
+        controls_layout.addSpacing(
+            20
+        )
+
+        controls_layout.addWidget(
+            filter_label
+        )
+
+        controls_layout.addWidget(
+            self.filter_box
+        )
+
+
         active_label = QLabel(
             "Active Tasks"
         )
@@ -44,8 +102,9 @@ class TaskManagerWidget(QWidget):
 
         self.active_task_list = QListWidget()
 
-        self.active_task_list.setSpacing(5)
-
+        self.active_task_list.setSpacing(
+            5
+        )
 
 
         completed_label = QLabel(
@@ -59,8 +118,9 @@ class TaskManagerWidget(QWidget):
 
         self.completed_task_list = QListWidget()
 
-        self.completed_task_list.setSpacing(5)
-
+        self.completed_task_list.setSpacing(
+            5
+        )
 
 
         add_button = QPushButton(
@@ -72,20 +132,38 @@ class TaskManagerWidget(QWidget):
         )
 
 
+        layout.addWidget(
+            title
+        )
 
-        layout.addWidget(title)
+        layout.addLayout(
+            controls_layout
+        )
 
-        layout.addWidget(active_label)
-        layout.addWidget(self.active_task_list)
+        layout.addWidget(
+            active_label
+        )
 
-        layout.addWidget(completed_label)
-        layout.addWidget(self.completed_task_list)
+        layout.addWidget(
+            self.active_task_list
+        )
 
-        layout.addWidget(add_button)
+        layout.addWidget(
+            completed_label
+        )
+
+        layout.addWidget(
+            self.completed_task_list
+        )
+
+        layout.addWidget(
+            add_button
+        )
 
 
-        self.setLayout(layout)
-
+        self.setLayout(
+            layout
+        )
 
 
         managers.task_manager.tasks_updated.connect(
@@ -93,31 +171,26 @@ class TaskManagerWidget(QWidget):
         )
 
 
-
-        # Active task interactions
-
         self.active_task_list.itemDoubleClicked.connect(
             self.edit_task
         )
-
-        self.active_task_list.setContextMenuPolicy(
-            Qt.CustomContextMenu
-        )
-
-        self.active_task_list.customContextMenuRequested.connect(
-            self.show_task_menu
-        )
-
-
-
-        # Completed task interactions
 
         self.completed_task_list.itemDoubleClicked.connect(
             self.edit_task
         )
 
+
+        self.active_task_list.setContextMenuPolicy(
+            Qt.CustomContextMenu
+        )
+
         self.completed_task_list.setContextMenuPolicy(
             Qt.CustomContextMenu
+        )
+
+
+        self.active_task_list.customContextMenuRequested.connect(
+            self.show_task_menu
         )
 
         self.completed_task_list.customContextMenuRequested.connect(
@@ -125,17 +198,122 @@ class TaskManagerWidget(QWidget):
         )
 
 
+        self.sort_box.currentIndexChanged.connect(
+            self.refresh_tasks
+        )
+
+        self.filter_box.currentIndexChanged.connect(
+            self.refresh_tasks
+        )
+
 
         self.refresh_tasks()
 
 
 
-    def refresh_tasks(self):
+    def filter_tasks(
+        self,
+        tasks
+    ):
+
+        filter_value = self.filter_box.currentText()
+
+
+        if filter_value == "High Priority":
+
+            return [
+                task
+                for task in tasks
+                if task.get("priority") == "High"
+            ]
+
+
+        elif filter_value == "Medium Priority":
+
+            return [
+                task
+                for task in tasks
+                if task.get("priority") == "Medium"
+            ]
+
+
+        elif filter_value == "Low Priority":
+
+            return [
+                task
+                for task in tasks
+                if task.get("priority") == "Low"
+            ]
+
+
+        elif filter_value == "Due Today":
+
+            from datetime import date
+
+            today = str(date.today())
+
+
+            return [
+                task
+                for task in tasks
+                if task.get("due_date") == today
+            ]
+
+
+        return tasks
+
+
+
+    def sort_tasks(
+        self,
+        tasks
+    ):
+
+        sort_value = self.sort_box.currentText()
+
+
+        if sort_value == "Priority":
+
+            priority_order = {
+                "High": 1,
+                "Medium": 2,
+                "Low": 3
+            }
+
+
+            return sorted(
+                tasks,
+                key=lambda task:
+                    priority_order.get(
+                        task.get("priority"),
+                        4
+                    )
+            )
+
+
+        elif sort_value == "Due Date":
+
+            return sorted(
+                tasks,
+                key=lambda task:
+                    task.get(
+                        "due_date",
+                        "9999-99-99"
+                    )
+            )
+
+
+        return tasks
+
+
+
+    def refresh_tasks(
+        self
+    ):
 
         self.active_task_list.clear()
 
         self.completed_task_list.clear()
-
 
 
         active_tasks = (
@@ -148,6 +326,23 @@ class TaskManagerWidget(QWidget):
         )
 
 
+        active_tasks = self.filter_tasks(
+            active_tasks
+        )
+
+        completed_tasks = self.filter_tasks(
+            completed_tasks
+        )
+
+
+        active_tasks = self.sort_tasks(
+            active_tasks
+        )
+
+        completed_tasks = self.sort_tasks(
+            completed_tasks
+        )
+
 
         for task in active_tasks:
 
@@ -155,7 +350,6 @@ class TaskManagerWidget(QWidget):
                 self.active_task_list,
                 task
             )
-
 
 
         for task in completed_tasks:
@@ -189,7 +383,6 @@ class TaskManagerWidget(QWidget):
                 task.get("priority"),
                 "⚪"
             )
-
 
 
         text = (
@@ -226,7 +419,9 @@ class TaskManagerWidget(QWidget):
 
 
 
-    def add_task(self):
+    def add_task(
+        self
+    ):
 
         from dialogs.add_task_dialog import AddTaskDialog
 
@@ -251,7 +446,10 @@ class TaskManagerWidget(QWidget):
 
 
 
-    def edit_task(self, item):
+    def edit_task(
+        self,
+        item
+    ):
 
         task_id = item.data(
             Qt.UserRole
@@ -273,7 +471,6 @@ class TaskManagerWidget(QWidget):
             return
 
 
-
         from dialogs.add_task_dialog import AddTaskDialog
 
 
@@ -287,7 +484,6 @@ class TaskManagerWidget(QWidget):
                 "due_date"
             )
         )
-
 
 
         if dialog.exec():
@@ -306,7 +502,10 @@ class TaskManagerWidget(QWidget):
 
 
 
-    def show_task_menu(self, position):
+    def show_task_menu(
+        self,
+        position
+    ):
 
         sender = self.sender()
 
@@ -349,7 +548,9 @@ class TaskManagerWidget(QWidget):
 
         if action == edit_action:
 
-            self.edit_task(item)
+            self.edit_task(
+                item
+            )
 
 
         elif action == complete_action:
