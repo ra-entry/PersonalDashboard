@@ -92,7 +92,7 @@
         "title": "Get some sun",
         "priority": "Low",
         "due_date": "2026-07-21",
-        "completed": false,
+        "completed": true,
         "id": "f0a0912e-f2af-475c-b5b2-a41631e4fc1c"
     },
     {
@@ -106,14 +106,14 @@
         "id": "079305d6-cf01-4d8d-81c4-f20984393e21",
         "title": "Task ABC",
         "priority": "Medium",
-        "due_date": "2026-07-23",
-        "completed": false
+        "due_date": "2026-07-24",
+        "completed": true
     },
     {
         "id": "61e9d41c-4873-488c-87b4-a0fb5e578dad",
         "title": "Brush teeth",
         "priority": "Medium",
         "due_date": "2026-07-22",
-        "completed": false
+        "completed": true
     }
 ]

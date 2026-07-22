@@ -91,11 +91,11 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        active_label = QLabel(
-            "Active Tasks"
+        self.active_label = QLabel(
+            "Active Tasks (0)"
         )
 
-        active_label.setStyleSheet("""
+        self.active_label.setStyleSheet("""
             font-weight: bold;
         """)
 
@@ -107,11 +107,11 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        completed_label = QLabel(
-            "Completed Tasks"
+        self.completed_label = QLabel(
+            "Completed Tasks (0)"
         )
 
-        completed_label.setStyleSheet("""
+        self.completed_label.setStyleSheet("""
             font-weight: bold;
         """)
 
@@ -141,7 +141,7 @@ class TaskManagerWidget(QWidget):
         )
 
         layout.addWidget(
-            active_label
+            self.active_label
         )
 
         layout.addWidget(
@@ -149,7 +149,7 @@ class TaskManagerWidget(QWidget):
         )
 
         layout.addWidget(
-            completed_label
+            self.completed_label
         )
 
         layout.addWidget(
@@ -334,6 +334,14 @@ class TaskManagerWidget(QWidget):
             completed_tasks
         )
 
+        self.active_label.setText(
+            f"Active Tasks ({len(active_tasks)})"
+        )
+
+
+        self.completed_label.setText(
+            f"Completed Tasks ({len(completed_tasks)})"
+        )
 
         active_tasks = self.sort_tasks(
             active_tasks
@@ -344,23 +352,53 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        for task in active_tasks:
+        if active_tasks:
 
-            self.add_task_item(
-                self.active_task_list,
-                task
+            for task in active_tasks:
+
+                self.add_task_item(
+                    self.active_task_list,
+                    task
+                )
+
+        else:
+
+            empty_item = QListWidgetItem(
+                "🎉 No active tasks"
+            )
+
+            empty_item.setFlags(
+                Qt.NoItemFlags
+            )
+
+            self.active_task_list.addItem(
+                empty_item
             )
 
 
-        for task in completed_tasks:
+        if completed_tasks:
 
-            self.add_task_item(
-                self.completed_task_list,
-                task,
-                completed=True
+            for task in completed_tasks:
+
+                self.add_task_item(
+                    self.completed_task_list,
+                    task,
+                    completed=True
+                )
+
+        else:
+
+            empty_item = QListWidgetItem(
+                "No completed tasks yet"
             )
 
+            empty_item.setFlags(
+                Qt.NoItemFlags
+            )
 
+            self.completed_task_list.addItem(
+                empty_item
+            )
 
     def add_task_item(
         self,
