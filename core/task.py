@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from PySide6.QtCore import Qt
 
 class Task:
 
@@ -14,8 +14,8 @@ class Task:
         created_date=None,
         completed_date=None,
         estimated_minutes=30,
-        notes="",
         recurrence="None",
+        notes="",
         depends_on=None
     ):
 
@@ -56,8 +56,8 @@ class Task:
             "completed_date": self.completed_date,
             "estimated_minutes": self.estimated_minutes,
             "notes": self.notes,
+            "recurrence": self.recurrence,
             "depends_on": self.depends_on,
-            "recurrence": self.recurrence
         }
 
 
@@ -118,10 +118,10 @@ class Task:
             recurrence=data.get(
                 "recurrence",
                 "None"
-            )
+            ),
+
+            depends_on=data.get("depends_on", [])
         )
-
-
 
     # Compatibility helpers
     # Lets old widget code still work

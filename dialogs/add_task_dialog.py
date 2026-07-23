@@ -7,10 +7,17 @@ from PySide6.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QSpinBox,
-    QTextEdit
+    QTextEdit,
+    QListWidget,
+    QListWidgetItem
 )
 
-from PySide6.QtCore import QDate
+from PySide6.QtCore import (
+    QDate,
+    Qt
+)
+
+import managers
 
 
 class AddTaskDialog(QDialog):
@@ -23,10 +30,13 @@ class AddTaskDialog(QDialog):
         due_date=None,
         estimated_minutes=30,
         recurrence="None",
-        notes=""
+        notes="",
+        depends_on=None,
+        editing_task_id=None
     ):
 
         super().__init__()
+        self.editing_task_id = editing_task_id
 
         self.setWindowTitle(
             "Task"
@@ -130,7 +140,7 @@ class AddTaskDialog(QDialog):
                 QDate.currentDate()
             )
 
-
+        self.dependencies_list = QListWidget()
         self.estimated_input = QSpinBox()
 
         self.estimated_input.setRange(
@@ -151,7 +161,6 @@ class AddTaskDialog(QDialog):
         self.notes_input.setPlainText(
             notes
         )
-
 
         form = QFormLayout()
 
@@ -190,6 +199,39 @@ class AddTaskDialog(QDialog):
             self.notes_input
         )
 
+        form.addRow(
+            "Depends On:",
+            self.dependencies_list
+        )
+
+        depends_on = depends_on or []
+
+        for task in managers.task_manager.tasks:
+
+            if task.id == self.editing_task_id:
+                continue
+
+            item = QListWidgetItem(task.title)
+
+            item.setFlags(
+                item.flags() | Qt.ItemIsUserCheckable
+            )
+
+            item.setData(
+                Qt.UserRole,
+                task.id
+            )
+
+            if task.id in depends_on:
+
+                item.setCheckState(Qt.Checked)
+
+            else:
+
+                item.setCheckState(Qt.Unchecked)
+
+            self.dependencies_list.addItem(item)
+
         button = QPushButton(
             "Save Task"
         )
@@ -218,6 +260,18 @@ class AddTaskDialog(QDialog):
 
     def get_task_data(self):
 
+        depends_on = []
+
+        for i in range(self.dependencies_list.count()):
+
+            item = self.dependencies_list.item(i)
+
+            if item.checkState() == Qt.Checked:
+
+                depends_on.append(
+                    item.data(Qt.UserRole)
+                )
+
         return (
             self.task_input.text(),
 
@@ -230,5 +284,6 @@ class AddTaskDialog(QDialog):
             ),
             self.estimated_input.value(),
             self.recurrence_input.currentText(),
-            self.notes_input.toPlainText()
+            self.notes_input.toPlainText(),
+            depends_on
         )

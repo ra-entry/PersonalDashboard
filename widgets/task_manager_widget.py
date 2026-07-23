@@ -561,9 +561,7 @@ class TaskManagerWidget(QWidget):
 
 
 
-    def add_task(
-        self
-    ):
+    def add_task(self):
 
         from dialogs.add_task_dialog import AddTaskDialog
 
@@ -580,7 +578,8 @@ class TaskManagerWidget(QWidget):
                 due_date,
                 estimated_minutes,
                 recurrence,
-                notes
+                notes,
+                depends_on
             ) = dialog.get_task_data()
 
 
@@ -593,10 +592,9 @@ class TaskManagerWidget(QWidget):
                     due_date,
                     estimated_minutes,
                     recurrence,
-                    notes
+                    notes,
+                    depends_on,
                 )
-
-
 
     def edit_task(
         self,
@@ -628,7 +626,9 @@ class TaskManagerWidget(QWidget):
             task.due_date,
             task.estimated_minutes,
             task.recurrence,
-            task.notes
+            task.notes,
+            task.depends_on,
+            editing_task_id=task.id
         )
 
 
@@ -641,7 +641,8 @@ class TaskManagerWidget(QWidget):
                 due_date,
                 estimated_minutes,
                 recurrence,
-                notes
+                notes,
+                depends_on
             ) = dialog.get_task_data()
 
 
@@ -653,7 +654,8 @@ class TaskManagerWidget(QWidget):
                 due_date,
                 estimated_minutes,
                 recurrence,
-                notes
+                notes,
+                depends_on
             )
 
 
@@ -673,7 +675,9 @@ class TaskManagerWidget(QWidget):
             task.due_date,
             task.estimated_minutes,
             task.recurrence,
-            task.notes
+            task.notes,
+            task.depends_on,
+            editing_task_id=task.id
         )
 
 
@@ -686,7 +690,8 @@ class TaskManagerWidget(QWidget):
                 due_date,
                 estimated_minutes,
                 recurrence,
-                notes
+                notes,
+                depends_on
             ) = dialog.get_task_data()
 
 
@@ -698,50 +703,8 @@ class TaskManagerWidget(QWidget):
                 due_date,
                 estimated_minutes,
                 recurrence,
-                notes
-            )
-
-    def edit_selected_task(
-        self,
-        task
-    ):
-
-        from dialogs.add_task_dialog import AddTaskDialog
-
-
-        dialog = AddTaskDialog(
-            task.title,
-            task.priority,
-            task.category,
-            task.due_date,
-            task.estimated_minutes,
-            task.recurrence,
-            task.notes
-        )
-
-
-        if dialog.exec():
-
-            (
-                new_title,
-                priority,
-                category,
-                due_date,
-                estimated_minutes,
-                recurrence,
-                notes
-            ) = dialog.get_task_data()
-
-
-            managers.task_manager.update_task(
-                task.id,
-                new_title,
-                priority,
-                category,
-                due_date,
-                estimated_minutes,
-                recurrence,
-                notes
+                notes,
+                depends_on,
             )
 
     def complete_selected_task(
@@ -756,27 +719,18 @@ class TaskManagerWidget(QWidget):
             )
 
         else:
-
-            managers.task_manager.complete_task(
+            success = managers.task_manager.complete_task(
                 task.id
             )
 
-    def complete_selected_task(
-        self,
-        task
-    ):
 
-        if task.completed:
+            if not success:
 
-            managers.task_manager.restore_task(
-                task.id
-            )
-
-        else:
-
-            managers.task_manager.complete_task(
-                task.id
-            )
+                QMessageBox.warning(
+                    self,
+                    "Cannot Complete Task",
+                    "This task cannot be completed because it has unfinished dependencies."
+                )
 
 
 

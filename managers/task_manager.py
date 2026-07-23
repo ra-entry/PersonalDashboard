@@ -26,44 +26,66 @@ class TaskManager(QObject):
 
     def load_tasks(self):
 
-        if os.path.exists(self.file_path):
+        if os.path.exists(self.file_path) and os.path.getsize(self.file_path) > 0:
 
             with open(
                 self.file_path,
                 "r"
             ) as file:
 
-                data = json.load(file)
+                try:
+                    data = json.load(file)
 
+                except json.JSONDecodeError:
 
-            self.tasks = []
-
-
-            for item in data:
-
-                if "id" not in item:
-
-                    item["id"] = str(uuid.uuid4())
-
-
-                if "category" not in item:
-
-                    item["category"] = "Personal"
-
-
-                self.tasks.append(
-                    Task.from_dict(item)
-                )
-
+                    data = []
 
         else:
 
-            self.tasks = []
+            data = []
+
+
+        self.tasks = []
+
+
+        for item in data:
+
+            if "id" not in item:
+
+                item["id"] = str(uuid.uuid4())
+
+
+            if "category" not in item:
+
+                item["category"] = "Personal"
+
+
+            if "recurrence" not in item:
+
+                item["recurrence"] = "None"
+
+
+            if "depends_on" not in item:
+
+                item["depends_on"] = []
+
+
+            if "notes" not in item:
+
+                item["notes"] = ""
+
+
+            if "estimated_minutes" not in item:
+
+                item["estimated_minutes"] = 30
+
+
+            self.tasks.append(
+                Task.from_dict(item)
+            )
 
 
         self.tasks_updated.emit()
-
-
 
     def save_tasks(self):
 
@@ -96,7 +118,8 @@ class TaskManager(QObject):
         due_date=None,
         estimated_minutes=30,
         recurrence=None,
-        notes=""
+        notes="",
+        depends_on=None
     ):
 
         self.tasks.append(
@@ -111,7 +134,8 @@ class TaskManager(QObject):
                 created_date=datetime.now().isoformat(),
                 completed_date=None,
                 recurrence=recurrence,
-                notes = notes
+                notes = notes,
+                depends_on=depends_on
             )
         )
 
@@ -131,7 +155,8 @@ class TaskManager(QObject):
         due_date,
         estimated_minutes=30,
         recurrence="None",
-        notes=""
+        notes="",
+        depends_on=None
     ):
 
         task = self.get_task_by_id(
@@ -148,15 +173,52 @@ class TaskManager(QObject):
             task.estimated_minutes = estimated_minutes
             task.recurrence = recurrence
             task.notes = notes
+            task.depends_on = [
+                dependency
+                for dependency in (depends_on or [])
+                if dependency != task.id
+            ]
 
             self.save_tasks()
 
             self.tasks_updated.emit()
 
+
+    def can_complete_task(
+        self,
+        task_id
+    ):
+
+        task = self.get_task_by_id(
+            task_id
+        )
+
+        if task is None:
+            return False
+
+
+        for dependency_id in task.depends_on:
+
+            dependency_task = self.get_task_by_id(
+                dependency_id
+            )
+
+            if dependency_task and not dependency_task.completed:
+
+                return False
+
+
+        return True
+    
+
     def complete_task(
         self,
         task_id
     ):
+
+        if not self.can_complete_task(task_id):
+
+            return False
 
         from datetime import datetime
 
@@ -178,7 +240,7 @@ class TaskManager(QObject):
 
         self.tasks_updated.emit()
 
-
+        return True
 
     def restore_task(
         self,
