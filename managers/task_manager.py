@@ -142,6 +142,23 @@ class TaskManager(QObject):
         self.tasks_updated.emit()
 
 
+    def restore_task(
+        self,
+        task_id
+    ):
+
+        for task in self.tasks:
+
+            if task["id"] == task_id:
+
+                task["completed"] = False
+
+                break
+
+
+        self.save_tasks()
+
+        self.tasks_updated.emit()
 
     def get_active_tasks(self):
 

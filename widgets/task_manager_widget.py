@@ -7,8 +7,11 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QMenu,
     QComboBox,
-    QHBoxLayout
+    QHBoxLayout,
+    QSplitter
 )
+
+from widgets.task_detail_widget import TaskDetailWidget
 
 from PySide6.QtCore import Qt
 
@@ -118,6 +121,16 @@ class TaskManagerWidget(QWidget):
 
         self.completed_task_list = QListWidget()
 
+        self.task_detail = TaskDetailWidget()
+
+        self.task_detail.edit_requested.connect(
+            self.edit_selected_task
+        )
+
+        self.task_detail.complete_requested.connect(
+            self.complete_selected_task
+        )
+
         self.completed_task_list.setSpacing(
             5
         )
@@ -140,20 +153,45 @@ class TaskManagerWidget(QWidget):
             controls_layout
         )
 
-        layout.addWidget(
+        splitter = QSplitter()
+
+
+        left_layout = QVBoxLayout()
+
+        left_layout.addWidget(
             self.active_label
         )
 
-        layout.addWidget(
+        left_layout.addWidget(
             self.active_task_list
         )
 
-        layout.addWidget(
+        left_layout.addWidget(
             self.completed_label
         )
 
-        layout.addWidget(
+        left_layout.addWidget(
             self.completed_task_list
+        )
+
+
+        left_widget = QWidget()
+        left_widget.setLayout(
+            left_layout
+        )
+
+
+        splitter.addWidget(
+            left_widget
+        )
+
+        splitter.addWidget(
+            self.task_detail
+        )
+
+
+        layout.addWidget(
+            splitter
         )
 
         layout.addWidget(
@@ -179,6 +217,13 @@ class TaskManagerWidget(QWidget):
             self.edit_task
         )
 
+        self.active_task_list.itemClicked.connect(
+            self.select_task
+        )
+
+        self.completed_task_list.itemClicked.connect(
+            self.select_task
+        )
 
         self.active_task_list.setContextMenuPolicy(
             Qt.CustomContextMenu
@@ -209,7 +254,31 @@ class TaskManagerWidget(QWidget):
 
         self.refresh_tasks()
 
+    def select_task(
+        self,
+        item
+    ):
 
+        task_id = item.data(
+            Qt.UserRole
+        )
+
+
+        task = next(
+            (
+                t
+                for t in managers.task_manager.tasks
+                if t["id"] == task_id
+            ),
+            None
+        )
+
+
+        if task:
+
+            self.task_detail.show_task(
+                task
+            )
 
     def filter_tasks(
         self,
@@ -399,6 +468,26 @@ class TaskManagerWidget(QWidget):
             self.completed_task_list.addItem(
                 empty_item
             )
+                # Refresh details panel if a task is selected
+
+        if self.task_detail.current_task:
+
+            task_id = self.task_detail.current_task["id"]
+
+            updated_task = next(
+                (
+                    task
+                    for task in managers.task_manager.tasks
+                    if task["id"] == task_id
+                ),
+                None
+            )
+
+            if updated_task:
+
+                self.task_detail.show_task(
+                    updated_task
+                )
 
     def add_task_item(
         self,
@@ -555,6 +644,56 @@ class TaskManagerWidget(QWidget):
             )
 
 
+    def edit_selected_task(
+        self,
+        task
+    ):
+
+        from dialogs.add_task_dialog import AddTaskDialog
+
+
+        dialog = AddTaskDialog(
+            task["title"],
+            task.get(
+                "priority",
+                "Medium"
+            ),
+            task.get(
+                "category",
+                "Personal"
+            ),
+            task.get(
+                "due_date"
+            )
+        )
+
+
+        if dialog.exec():
+
+            (
+                new_title,
+                priority,
+                category,
+                due_date
+            ) = dialog.get_task_data()
+
+
+            managers.task_manager.update_task(
+                task["id"],
+                new_title,
+                priority,
+                category,
+                due_date
+            )
+
+    def complete_selected_task(
+        self,
+        task
+    ):
+
+        managers.task_manager.complete_task(
+            task["id"]
+        )
 
     def show_task_menu(
         self,
@@ -578,6 +717,17 @@ class TaskManagerWidget(QWidget):
             Qt.UserRole
         )
 
+        task = next(
+            (
+                t
+                for t in managers.task_manager.get_all_tasks()
+                if t["id"] == task_id
+            ),
+            None
+        )
+
+        if task is None:
+            return
 
         menu = QMenu()
 
@@ -586,9 +736,27 @@ class TaskManagerWidget(QWidget):
             "✏ Edit Task"
         )
 
-        complete_action = menu.addAction(
-            "✓ Complete Task"
+        task = next(
+            (
+                t
+                for t in managers.task_manager.tasks
+                if t["id"] == task_id
+            ),
+            None
         )
+
+
+        if task and task["completed"]:
+
+            complete_action = menu.addAction(
+                "↩ Mark Active"
+            )
+
+        else:
+
+            complete_action = menu.addAction(
+                "✓ Complete Task"
+            )
 
         delete_action = menu.addAction(
             "🗑 Delete Task"
@@ -609,9 +777,17 @@ class TaskManagerWidget(QWidget):
 
         elif action == complete_action:
 
-            managers.task_manager.complete_task(
-                task_id
-            )
+            if task["completed"]:
+
+                managers.task_manager.restore_task(
+                    task_id
+                )
+
+            else:
+
+                managers.task_manager.complete_task(
+                    task_id
+                )
 
 
         elif action == delete_action:

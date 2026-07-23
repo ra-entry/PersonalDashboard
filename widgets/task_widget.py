@@ -343,6 +343,17 @@ class TaskWidget(QWidget):
             Qt.UserRole
         )
 
+        task = next(
+            (
+                t
+                for t in managers.task_manager.get_all_tasks()
+                if t["id"] == task_id
+            ),
+            None
+        )
+
+        if task is None:
+            return
 
         if task_id is None:
             return
@@ -355,9 +366,17 @@ class TaskWidget(QWidget):
             "✏ Edit Task"
         )
 
-        complete_action = menu.addAction(
-            "✓ Complete Task"
-        )
+        if task["completed"]:
+
+            complete_action = menu.addAction(
+                "↩ Mark Active"
+            )
+
+        else:
+
+            complete_action = menu.addAction(
+                "✓ Complete Task"
+            )
 
         delete_action = menu.addAction(
             "🗑 Delete Task"
@@ -376,9 +395,17 @@ class TaskWidget(QWidget):
 
         elif action == complete_action:
 
-            managers.task_manager.complete_task(
-                task_id
-            )
+            if task["completed"]:
+
+                managers.task_manager.restore_task(
+                    task_id
+                )
+
+            else:
+
+                managers.task_manager.complete_task(
+                    task_id
+                )
 
 
         elif action == delete_action:
