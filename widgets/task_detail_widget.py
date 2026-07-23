@@ -4,17 +4,22 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton
 )
+
 from PySide6.QtCore import Signal
+
 
 class TaskDetailWidget(QWidget):
 
     edit_requested = Signal(dict)
     complete_requested = Signal(dict)
 
+
     def __init__(self):
         super().__init__()
 
+
         self.current_task = None
+
 
         layout = QVBoxLayout()
 
@@ -23,9 +28,25 @@ class TaskDetailWidget(QWidget):
             "Select a task"
         )
 
-        self.category_label = QLabel("")
-        self.priority_label = QLabel("")
-        self.due_date_label = QLabel("")
+
+        self.category_label = QLabel(
+            ""
+        )
+
+
+        self.priority_label = QLabel(
+            ""
+        )
+
+
+        self.due_date_label = QLabel(
+            ""
+        )
+
+
+        self.status_label = QLabel(
+            ""
+        )
 
 
         self.title_label.setStyleSheet(
@@ -40,6 +61,7 @@ class TaskDetailWidget(QWidget):
             "✏ Edit Task"
         )
 
+
         self.complete_button = QPushButton(
             "✓ Complete Task"
         )
@@ -49,17 +71,21 @@ class TaskDetailWidget(QWidget):
             False
         )
 
+
         self.complete_button.setEnabled(
             False
         )
+
 
         self.edit_button.clicked.connect(
             self.request_edit
         )
 
+
         self.complete_button.clicked.connect(
             self.request_complete
         )
+
 
         layout.addWidget(
             self.title_label
@@ -75,6 +101,10 @@ class TaskDetailWidget(QWidget):
 
         layout.addWidget(
             self.due_date_label
+        )
+
+        layout.addWidget(
+            self.status_label
         )
 
 
@@ -124,6 +154,27 @@ class TaskDetailWidget(QWidget):
         )
 
 
+        if task.get("completed"):
+
+            self.status_label.setText(
+                "Status: ✓ Completed"
+            )
+
+            self.complete_button.setText(
+                "↩ Mark Active"
+            )
+
+        else:
+
+            self.status_label.setText(
+                "Status: Active"
+            )
+
+            self.complete_button.setText(
+                "✓ Complete Task"
+            )
+
+
         self.edit_button.setEnabled(
             True
         )
@@ -131,9 +182,49 @@ class TaskDetailWidget(QWidget):
         self.complete_button.setEnabled(
             True
         )
+
+
+
+    def clear_task(self):
+
+        self.current_task = None
+
+
+        self.title_label.setText(
+            "Select a task"
+        )
+
+
+        self.category_label.setText(
+            ""
+        )
+
+        self.priority_label.setText(
+            ""
+        )
+
+        self.due_date_label.setText(
+            ""
+        )
+
+        self.status_label.setText(
+            ""
+        )
+
+
+        self.edit_button.setEnabled(
+            False
+        )
+
+        self.complete_button.setEnabled(
+            False
+        )
+
+
+
     def request_edit(self):
 
-        if hasattr(self, "current_task"):
+        if self.current_task:
 
             self.edit_requested.emit(
                 self.current_task
@@ -143,7 +234,7 @@ class TaskDetailWidget(QWidget):
 
     def request_complete(self):
 
-        if hasattr(self, "current_task"):
+        if self.current_task:
 
             self.complete_requested.emit(
                 self.current_task

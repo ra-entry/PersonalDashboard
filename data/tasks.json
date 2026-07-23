@@ -141,29 +141,5 @@
         "category": "Work",
         "due_date": "2026-07-22",
         "completed": false
-    },
-    {
-        "id": "297aaad5-0be2-4eae-8caa-fdf769a85d4a",
-        "title": "Test1.8",
-        "priority": "Medium",
-        "category": "Personal",
-        "due_date": "2026-07-24",
-        "completed": false
-    },
-    {
-        "id": "6377f594-c5d8-4956-b7ba-35013ee4fad8",
-        "title": "Test 2.9",
-        "priority": "Medium",
-        "category": "Personal",
-        "due_date": "2026-07-22",
-        "completed": true
-    },
-    {
-        "id": "78395727-8a7c-4dd0-b2a8-44a70a439d17",
-        "title": "Test2.6",
-        "priority": "Medium",
-        "category": "Personal",
-        "due_date": "2026-07-22",
-        "completed": true
     }
 ]

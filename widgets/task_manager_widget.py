@@ -687,13 +687,20 @@ class TaskManagerWidget(QWidget):
             )
 
     def complete_selected_task(
-        self,
-        task
+            self,
+            task
     ):
 
-        managers.task_manager.complete_task(
-            task["id"]
-        )
+        if task.get("completed"):
+
+            managers.task_manager.restore_task(
+                task["id"]
+            )
+
+        else:
+
+            managers.task_manager.complete_task(
+                task["id"])
 
     def show_task_menu(
         self,
