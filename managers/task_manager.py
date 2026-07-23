@@ -4,6 +4,9 @@ import uuid
 
 from PySide6.QtCore import QObject, Signal
 
+from core.task import Task
+from datetime import datetime
+
 
 class TaskManager(QObject):
 
@@ -30,18 +33,29 @@ class TaskManager(QObject):
                 "r"
             ) as file:
 
-                self.tasks = json.load(file)
-    
-            for task in self.tasks:
+                data = json.load(file)
 
-                if "id" not in task:
 
-                    task["id"] = str(uuid.uuid4())
+            self.tasks = []
 
-                if "category" not in task:
 
-                    task["category"] = "Personal"
-                
+            for item in data:
+
+                if "id" not in item:
+
+                    item["id"] = str(uuid.uuid4())
+
+
+                if "category" not in item:
+
+                    item["category"] = "Personal"
+
+
+                self.tasks.append(
+                    Task.from_dict(item)
+                )
+
+
         else:
 
             self.tasks = []
@@ -64,7 +78,10 @@ class TaskManager(QObject):
         ) as file:
 
             json.dump(
-                self.tasks,
+                [
+                    task.to_dict()
+                    for task in self.tasks
+                ],
                 file,
                 indent=4
             )
@@ -76,19 +93,28 @@ class TaskManager(QObject):
         title,
         priority,
         category,
-        due_date=None
+        due_date=None,
+        estimated_minutes=30,
+        recurrence=None,
+        notes=""
     ):
 
         self.tasks.append(
-            {
-                "id": str(uuid.uuid4()),
-                "title": title,
-                "priority": priority,
-                "category": category,
-                "due_date": due_date,
-                "completed": False
-            }
+            Task(
+                title=title,
+                priority=priority,
+                category=category,
+                due_date=due_date,
+                completed=False,
+                task_id=str(uuid.uuid4()),
+                estimated_minutes=estimated_minutes,
+                created_date=datetime.now().isoformat(),
+                completed_date=None,
+                recurrence=recurrence,
+                notes = notes
+            )
         )
+
 
         self.save_tasks()
 
@@ -102,37 +128,48 @@ class TaskManager(QObject):
         new_title,
         priority,
         category,
-        due_date
+        due_date,
+        estimated_minutes=30,
+        recurrence="None",
+        notes=""
     ):
 
-        for task in self.tasks:
-
-            if task["id"] == task_id:
-
-                task["title"] = new_title.strip()
-                task["priority"] = priority
-                task["category"] = category
-                task["due_date"] = due_date
-
-                break
+        task = self.get_task_by_id(
+            task_id
+        )
 
 
-        self.save_tasks()
+        if task:
 
-        self.tasks_updated.emit()
+            task.title = new_title.strip()
+            task.priority = priority
+            task.category = category
+            task.due_date = due_date
+            task.estimated_minutes = estimated_minutes
+            task.recurrence = recurrence
+            task.notes = notes
 
+            self.save_tasks()
 
+            self.tasks_updated.emit()
 
     def complete_task(
         self,
         task_id
     ):
 
+        from datetime import datetime
+
+
         for task in self.tasks:
 
-            if task["id"] == task_id:
+            if task.id == task_id:
 
-                task["completed"] = True
+                task.completed = True
+
+                task.completed_date = (
+                    datetime.now().isoformat()
+                )
 
                 break
 
@@ -140,6 +177,7 @@ class TaskManager(QObject):
         self.save_tasks()
 
         self.tasks_updated.emit()
+
 
 
     def restore_task(
@@ -149,9 +187,11 @@ class TaskManager(QObject):
 
         for task in self.tasks:
 
-            if task["id"] == task_id:
+            if task.id == task_id:
 
-                task["completed"] = False
+                task.completed = False
+
+                task.completed_date = None
 
                 break
 
@@ -160,26 +200,44 @@ class TaskManager(QObject):
 
         self.tasks_updated.emit()
 
+    def get_task_by_id(
+        self,
+        task_id
+    ):
+
+        for task in self.tasks:
+
+            if task.id == task_id:
+
+                return task
+
+
+        return None
+
     def get_active_tasks(self):
 
         return [
             task
             for task in self.tasks
-            if not task["completed"]
+            if not task.completed
         ]
+
+
 
     def get_completed_tasks(self):
 
         return [
             task
             for task in self.tasks
-            if task["completed"]
+            if task.completed
         ]
+
 
     def get_all_tasks(self):
 
         return self.tasks
-    
+
+
     def delete_task(
         self,
         task_id
@@ -188,7 +246,7 @@ class TaskManager(QObject):
         self.tasks = [
             task
             for task in self.tasks
-            if task["id"] != task_id
+            if task.id != task_id
         ]
 
 
@@ -196,3 +254,19 @@ class TaskManager(QObject):
 
         self.tasks_updated.emit()
 
+    def task_is_available(
+        self,
+        task
+    ):
+
+        for dependency in task.depends_on:
+
+            dependency_task = self.get_task_by_id(
+                dependency
+            )
+
+            if dependency_task and not dependency_task.completed:
+
+                return False
+
+        return True

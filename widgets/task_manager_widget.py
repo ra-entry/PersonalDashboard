@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (
     QMenu,
     QComboBox,
     QHBoxLayout,
-    QSplitter
+    QSplitter,
+    QMessageBox
 )
 
 from widgets.task_detail_widget import TaskDetailWidget
@@ -20,10 +21,12 @@ from core.task_utils import get_due_description
 import managers
 
 
+
 class TaskManagerWidget(QWidget):
 
     def __init__(self):
         super().__init__()
+
 
         layout = QVBoxLayout()
 
@@ -32,10 +35,12 @@ class TaskManagerWidget(QWidget):
             "Task Management"
         )
 
-        title.setStyleSheet("""
+        title.setStyleSheet(
+            """
             font-size: 18px;
             font-weight: bold;
-        """)
+            """
+        )
 
 
         controls_layout = QHBoxLayout()
@@ -44,6 +49,7 @@ class TaskManagerWidget(QWidget):
         sort_label = QLabel(
             "Sort:"
         )
+
 
         self.sort_box = QComboBox()
 
@@ -59,6 +65,7 @@ class TaskManagerWidget(QWidget):
         filter_label = QLabel(
             "Filter:"
         )
+
 
         self.filter_box = QComboBox()
 
@@ -93,35 +100,31 @@ class TaskManagerWidget(QWidget):
             self.filter_box
         )
 
-
         self.active_label = QLabel(
             "Active Tasks (0)"
         )
-
-        self.active_label.setStyleSheet("""
-            font-weight: bold;
-        """)
-
-
-        self.active_task_list = QListWidget()
-
-        self.active_task_list.setSpacing(
-            5
-        )
-
 
         self.completed_label = QLabel(
             "Completed Tasks (0)"
         )
 
-        self.completed_label.setStyleSheet("""
-            font-weight: bold;
-        """)
 
+        self.active_label.setStyleSheet(
+            "font-weight: bold;"
+        )
+
+        self.completed_label.setStyleSheet(
+            "font-weight: bold;"
+        )
+
+
+        self.active_task_list = QListWidget()
 
         self.completed_task_list = QListWidget()
 
+
         self.task_detail = TaskDetailWidget()
+
 
         self.task_detail.edit_requested.connect(
             self.edit_selected_task
@@ -131,10 +134,9 @@ class TaskManagerWidget(QWidget):
             self.complete_selected_task
         )
 
-        self.completed_task_list.setSpacing(
-            5
+        self.task_detail.delete_requested.connect(
+            self.delete_selected_task
         )
-
 
         add_button = QPushButton(
             "+ Add Task"
@@ -144,7 +146,6 @@ class TaskManagerWidget(QWidget):
             self.add_task
         )
 
-
         layout.addWidget(
             title
         )
@@ -153,10 +154,12 @@ class TaskManagerWidget(QWidget):
             controls_layout
         )
 
+
         splitter = QSplitter()
 
 
         left_layout = QVBoxLayout()
+
 
         left_layout.addWidget(
             self.active_label
@@ -176,6 +179,7 @@ class TaskManagerWidget(QWidget):
 
 
         left_widget = QWidget()
+
         left_widget.setLayout(
             left_layout
         )
@@ -185,6 +189,7 @@ class TaskManagerWidget(QWidget):
             left_widget
         )
 
+
         splitter.addWidget(
             self.task_detail
         )
@@ -193,6 +198,7 @@ class TaskManagerWidget(QWidget):
         layout.addWidget(
             splitter
         )
+
 
         layout.addWidget(
             add_button
@@ -208,6 +214,14 @@ class TaskManagerWidget(QWidget):
             self.refresh_tasks
         )
 
+        self.active_task_list.itemClicked.connect(
+            self.select_task
+        )
+
+        self.completed_task_list.itemClicked.connect(
+            self.select_task
+        )
+
 
         self.active_task_list.itemDoubleClicked.connect(
             self.edit_task
@@ -215,14 +229,6 @@ class TaskManagerWidget(QWidget):
 
         self.completed_task_list.itemDoubleClicked.connect(
             self.edit_task
-        )
-
-        self.active_task_list.itemClicked.connect(
-            self.select_task
-        )
-
-        self.completed_task_list.itemClicked.connect(
-            self.select_task
         )
 
         self.active_task_list.setContextMenuPolicy(
@@ -247,32 +253,27 @@ class TaskManagerWidget(QWidget):
             self.refresh_tasks
         )
 
+
         self.filter_box.currentIndexChanged.connect(
             self.refresh_tasks
         )
 
-
         self.refresh_tasks()
+
 
     def select_task(
         self,
         item
     ):
 
+
         task_id = item.data(
             Qt.UserRole
         )
 
-
-        task = next(
-            (
-                t
-                for t in managers.task_manager.tasks
-                if t["id"] == task_id
-            ),
-            None
+        task = managers.task_manager.get_task_by_id(
+            task_id
         )
-
 
         if task:
 
@@ -293,7 +294,7 @@ class TaskManagerWidget(QWidget):
             return [
                 task
                 for task in tasks
-                if task.get("priority") == "High"
+                if task.priority == "High"
             ]
 
 
@@ -302,7 +303,7 @@ class TaskManagerWidget(QWidget):
             return [
                 task
                 for task in tasks
-                if task.get("priority") == "Medium"
+                if task.priority == "Medium"
             ]
 
 
@@ -311,7 +312,7 @@ class TaskManagerWidget(QWidget):
             return [
                 task
                 for task in tasks
-                if task.get("priority") == "Low"
+                if task.priority == "Low"
             ]
 
 
@@ -319,18 +320,19 @@ class TaskManagerWidget(QWidget):
 
             from datetime import date
 
-            today = str(date.today())
+            today = str(
+                date.today()
+            )
 
 
             return [
                 task
                 for task in tasks
-                if task.get("due_date") == today
+                if task.due_date == today
             ]
 
 
         return tasks
-
 
 
     def sort_tasks(
@@ -339,6 +341,7 @@ class TaskManagerWidget(QWidget):
     ):
 
         sort_value = self.sort_box.currentText()
+
 
 
         if sort_value == "Priority":
@@ -354,10 +357,11 @@ class TaskManagerWidget(QWidget):
                 tasks,
                 key=lambda task:
                     priority_order.get(
-                        task.get("priority"),
+                        task.priority,
                         4
                     )
             )
+
 
 
         elif sort_value == "Due Date":
@@ -365,16 +369,11 @@ class TaskManagerWidget(QWidget):
             return sorted(
                 tasks,
                 key=lambda task:
-                    task.get(
-                        "due_date",
-                        "9999-99-99"
-                    )
+                    task.due_date or "9999-99-99"
             )
 
 
         return tasks
-
-
 
     def refresh_tasks(
         self
@@ -403,6 +402,7 @@ class TaskManagerWidget(QWidget):
             completed_tasks
         )
 
+
         self.active_label.setText(
             f"Active Tasks ({len(active_tasks)})"
         )
@@ -411,6 +411,7 @@ class TaskManagerWidget(QWidget):
         self.completed_label.setText(
             f"Completed Tasks ({len(completed_tasks)})"
         )
+
 
         active_tasks = self.sort_tasks(
             active_tasks
@@ -468,26 +469,35 @@ class TaskManagerWidget(QWidget):
             self.completed_task_list.addItem(
                 empty_item
             )
-                # Refresh details panel if a task is selected
+
+
+        # Refresh details panel if selected task still exists
 
         if self.task_detail.current_task:
 
-            task_id = self.task_detail.current_task["id"]
+            task_id = self.task_detail.current_task.id
+
 
             updated_task = next(
                 (
                     task
                     for task in managers.task_manager.tasks
-                    if task["id"] == task_id
+                    if task.id == task_id
                 ),
                 None
             )
+
 
             if updated_task:
 
                 self.task_detail.show_task(
                     updated_task
                 )
+
+            else:
+
+                self.task_detail.clear_task()
+    
 
     def add_task_item(
         self,
@@ -507,28 +517,23 @@ class TaskManagerWidget(QWidget):
                 "Medium": "🟡",
                 "Low": "🟢"
             }.get(
-                task.get("priority"),
+                task.priority,
                 "⚪"
             )
 
 
         text = (
-            f"{icon} {task['title']}"
-        )
-
-        category = task.get(
-            "category",
-            "Personal"
+            f"{icon} {task.title}"
         )
 
 
         text += (
-            f"\n    {category}"
+            f"\n    {task.category}"
         )
 
 
         due_text = get_due_description(
-            task.get("due_date")
+            task.due_date
         )
 
 
@@ -546,7 +551,7 @@ class TaskManagerWidget(QWidget):
 
         item.setData(
             Qt.UserRole,
-            task["id"]
+            task.id
         )
 
 
@@ -568,18 +573,27 @@ class TaskManagerWidget(QWidget):
 
         if dialog.exec():
 
-            task, priority, category, due_date = (
-                dialog.get_task_data()
-            )
+            (
+                title,
+                priority,
+                category,
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
+            ) = dialog.get_task_data()
 
 
-            if task:
+            if title:
 
                 managers.task_manager.add_task(
-                    task,
+                    title,
                     priority,
                     category,
-                    due_date
+                    due_date,
+                    estimated_minutes,
+                    recurrence,
+                    notes
                 )
 
 
@@ -594,13 +608,8 @@ class TaskManagerWidget(QWidget):
         )
 
 
-        task = next(
-            (
-                t
-                for t in managers.task_manager.tasks
-                if t["id"] == task_id
-            ),
-            None
+        task = managers.task_manager.get_task_by_id(
+            task_id
         )
 
 
@@ -613,35 +622,40 @@ class TaskManagerWidget(QWidget):
 
 
         dialog = AddTaskDialog(
-            task["title"],
-            task.get(
-                "priority",
-                "Medium"
-            ),
-            task.get(
-                "category",
-                "Personal"
-            ),
-            task.get(
-                "due_date"
-            )
+            task.title,
+            task.priority,
+            task.category,
+            task.due_date,
+            task.estimated_minutes,
+            task.recurrence,
+            task.notes
         )
 
 
         if dialog.exec():
 
-            new_title, priority, category, due_date = (
-                dialog.get_task_data()
-            )
-
-
-            managers.task_manager.update_task(
-                task_id,
+            (
                 new_title,
                 priority,
                 category,
-                due_date
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
+            ) = dialog.get_task_data()
+
+
+            managers.task_manager.update_task(
+                task.id,
+                new_title,
+                priority,
+                category,
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
             )
+
 
 
     def edit_selected_task(
@@ -653,18 +667,13 @@ class TaskManagerWidget(QWidget):
 
 
         dialog = AddTaskDialog(
-            task["title"],
-            task.get(
-                "priority",
-                "Medium"
-            ),
-            task.get(
-                "category",
-                "Personal"
-            ),
-            task.get(
-                "due_date"
-            )
+            task.title,
+            task.priority,
+            task.category,
+            task.due_date,
+            task.estimated_minutes,
+            task.recurrence,
+            task.notes
         )
 
 
@@ -674,33 +683,129 @@ class TaskManagerWidget(QWidget):
                 new_title,
                 priority,
                 category,
-                due_date
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
             ) = dialog.get_task_data()
 
 
             managers.task_manager.update_task(
-                task["id"],
+                task.id,
                 new_title,
                 priority,
                 category,
-                due_date
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
+            )
+
+    def edit_selected_task(
+        self,
+        task
+    ):
+
+        from dialogs.add_task_dialog import AddTaskDialog
+
+
+        dialog = AddTaskDialog(
+            task.title,
+            task.priority,
+            task.category,
+            task.due_date,
+            task.estimated_minutes,
+            task.recurrence,
+            task.notes
+        )
+
+
+        if dialog.exec():
+
+            (
+                new_title,
+                priority,
+                category,
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
+            ) = dialog.get_task_data()
+
+
+            managers.task_manager.update_task(
+                task.id,
+                new_title,
+                priority,
+                category,
+                due_date,
+                estimated_minutes,
+                recurrence,
+                notes
             )
 
     def complete_selected_task(
-            self,
-            task
+        self,
+        task
     ):
 
-        if task.get("completed"):
+        if task.completed:
 
             managers.task_manager.restore_task(
-                task["id"]
+                task.id
             )
 
         else:
 
             managers.task_manager.complete_task(
-                task["id"])
+                task.id
+            )
+
+    def complete_selected_task(
+        self,
+        task
+    ):
+
+        if task.completed:
+
+            managers.task_manager.restore_task(
+                task.id
+            )
+
+        else:
+
+            managers.task_manager.complete_task(
+                task.id
+            )
+
+
+
+    def delete_selected_task(
+        self,
+        task
+    ):
+
+        confirmation = QMessageBox.question(
+            self,
+            "Delete Task",
+            f"Are you sure you want to delete:\n\n{task.title}?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+
+        if confirmation == QMessageBox.Yes:
+
+            managers.task_manager.delete_task(
+                task.id
+            )
+
+
+            if (
+                self.task_detail.current_task
+                and self.task_detail.current_task.id == task.id
+            ):
+
+                self.task_detail.clear_task()
 
     def show_task_menu(
         self,
@@ -724,17 +829,16 @@ class TaskManagerWidget(QWidget):
             Qt.UserRole
         )
 
-        task = next(
-            (
-                t
-                for t in managers.task_manager.get_all_tasks()
-                if t["id"] == task_id
-            ),
-            None
+
+        task = managers.task_manager.get_task_by_id(
+            task_id
         )
 
+
         if task is None:
+
             return
+
 
         menu = QMenu()
 
@@ -743,17 +847,8 @@ class TaskManagerWidget(QWidget):
             "✏ Edit Task"
         )
 
-        task = next(
-            (
-                t
-                for t in managers.task_manager.tasks
-                if t["id"] == task_id
-            ),
-            None
-        )
 
-
-        if task and task["completed"]:
+        if task.completed:
 
             complete_action = menu.addAction(
                 "↩ Mark Active"
@@ -765,13 +860,16 @@ class TaskManagerWidget(QWidget):
                 "✓ Complete Task"
             )
 
+
         delete_action = menu.addAction(
             "🗑 Delete Task"
         )
 
 
         action = menu.exec(
-            sender.mapToGlobal(position)
+            sender.mapToGlobal(
+                position
+            )
         )
 
 
@@ -784,21 +882,31 @@ class TaskManagerWidget(QWidget):
 
         elif action == complete_action:
 
-            if task["completed"]:
-
-                managers.task_manager.restore_task(
-                    task_id
-                )
-
-            else:
-
-                managers.task_manager.complete_task(
-                    task_id
-                )
+            self.complete_selected_task(
+                task
+            )
 
 
         elif action == delete_action:
 
-            managers.task_manager.delete_task(
-                task_id
+            confirmation = QMessageBox.question(
+                self,
+                "Delete Task",
+                f"Are you sure you want to delete:\n\n{task.title}?",
+                QMessageBox.Yes | QMessageBox.No
             )
+
+
+            if confirmation == QMessageBox.Yes:
+
+                managers.task_manager.delete_task(
+                    task.id
+                )
+
+
+                if (
+                    self.task_detail.current_task
+                    and self.task_detail.current_task.id == task.id
+                ):
+
+                    self.task_detail.clear_task()

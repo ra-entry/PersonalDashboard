@@ -5,7 +5,9 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDateEdit,
     QPushButton,
-    QVBoxLayout
+    QVBoxLayout,
+    QSpinBox,
+    QTextEdit
 )
 
 from PySide6.QtCore import QDate
@@ -18,7 +20,10 @@ class AddTaskDialog(QDialog):
         task=None,
         priority="Medium",
         category="Personal",
-        due_date=None
+        due_date=None,
+        estimated_minutes=30,
+        recurrence="None",
+        notes=""
     ):
 
         super().__init__()
@@ -80,6 +85,29 @@ class AddTaskDialog(QDialog):
                 category_index
             )
 
+
+        self.recurrence_input = QComboBox()
+
+        self.recurrence_input.addItems(
+            [
+                "None",
+                "Daily",
+                "Weekly",
+                "Monthly",
+                "Yearly"
+            ]
+        )
+
+        index = self.recurrence_input.findText(
+            recurrence
+        )
+
+        if index >= 0:
+
+            self.recurrence_input.setCurrentIndex(
+                index
+            )
+
         self.date_input = QDateEdit()
 
         self.date_input.setCalendarPopup(
@@ -103,6 +131,28 @@ class AddTaskDialog(QDialog):
             )
 
 
+        self.estimated_input = QSpinBox()
+
+        self.estimated_input.setRange(
+            5,
+            1440
+        )
+
+        self.estimated_input.setSingleStep(
+            5
+        )
+
+        self.estimated_input.setValue(
+            estimated_minutes
+        )
+
+        self.notes_input = QTextEdit()
+
+        self.notes_input.setPlainText(
+            notes
+        )
+
+
         form = QFormLayout()
 
         form.addRow(
@@ -121,10 +171,24 @@ class AddTaskDialog(QDialog):
         )
 
         form.addRow(
+            "Recurrence:",
+            self.recurrence_input
+        )
+
+        form.addRow(
             "Due Date:",
             self.date_input
         )
 
+        form.addRow(
+            "Estimated Time (minutes):",
+            self.estimated_input
+        )
+
+        form.addRow(
+            "Notes:",
+            self.notes_input
+        )
 
         button = QPushButton(
             "Save Task"
@@ -163,5 +227,8 @@ class AddTaskDialog(QDialog):
 
             self.date_input.date().toString(
                 "yyyy-MM-dd"
-            )
+            ),
+            self.estimated_input.value(),
+            self.recurrence_input.currentText(),
+            self.notes_input.toPlainText()
         )
