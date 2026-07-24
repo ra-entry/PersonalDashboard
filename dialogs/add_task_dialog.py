@@ -9,7 +9,8 @@ from PySide6.QtWidgets import (
     QSpinBox,
     QTextEdit,
     QListWidget,
-    QListWidgetItem
+    QListWidgetItem,
+    QLabel
 )
 
 from PySide6.QtCore import (
@@ -199,8 +200,19 @@ class AddTaskDialog(QDialog):
             self.notes_input
         )
 
+        dependency_label = QLabel(
+            "Depends On (select tasks that must be completed before this one):"
+        )
+
+        dependency_label.setWordWrap(
+            True
+        )
+
         form.addRow(
-            "Depends On:",
+            dependency_label
+        )
+
+        form.addRow(
             self.dependencies_list
         )
 
@@ -208,27 +220,47 @@ class AddTaskDialog(QDialog):
 
         for task in managers.task_manager.tasks:
 
+            # Prevent a task from depending on itself
             if task.id == self.editing_task_id:
                 continue
 
+
+            # Prevent circular dependencies
+            if self.editing_task_id:
+
+                if managers.task_manager.creates_circular_dependency(
+                    self.editing_task_id,
+                    task.id
+                ):
+                    continue
+
+
             item = QListWidgetItem(task.title)
+
 
             item.setFlags(
                 item.flags() | Qt.ItemIsUserCheckable
             )
+
 
             item.setData(
                 Qt.UserRole,
                 task.id
             )
 
+
             if task.id in depends_on:
 
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(
+                    Qt.Checked
+                )
 
             else:
 
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(
+                    Qt.Unchecked
+                )
+
 
             self.dependencies_list.addItem(item)
 

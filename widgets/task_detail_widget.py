@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Signal
+import managers
 
 
 class TaskDetailWidget(QWidget):
@@ -50,15 +51,11 @@ class TaskDetailWidget(QWidget):
         )
 
 
-        self.notes_label = QLabel(
-            ""
-        )
+        self.notes_label = QLabel("")
+        self.notes_label.setWordWrap(True)
 
-
-        self.notes_label.setWordWrap(
-            True
-        )
-
+        self.dependencies_label = QLabel("")
+        self.dependencies_label.setWordWrap(True)
 
         self.title_label.setStyleSheet(
             """
@@ -72,100 +69,47 @@ class TaskDetailWidget(QWidget):
         self.time_label = QLabel("")
 
 
-        self.edit_button = QPushButton(
-            "✏ Edit Task"
-        )
+        self.edit_button = QPushButton("✏ Edit Task")
+        self.complete_button = QPushButton("✓ Complete Task")
+        self.delete_button = QPushButton("🗑 Delete Task")
 
 
-        self.complete_button = QPushButton(
-            "✓ Complete Task"
-        )
+        self.edit_button.setEnabled(False)
+        self.complete_button.setEnabled(False)
+
+        self.delete_button.setEnabled(False)
+        self.edit_button.clicked.connect(self.request_edit)
+        self.complete_button.clicked.connect(self.request_complete)
 
 
-        self.delete_button = QPushButton(
-            "🗑 Delete Task"
-        )
+        self.delete_button.clicked.connect(self.request_delete)
 
 
-        self.edit_button.setEnabled(
-            False
-        )
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.category_label)
+        layout.addWidget(self.priority_label)
 
-        self.complete_button.setEnabled(
-            False
-        )
+        layout.addWidget(self.due_date_label)
 
-        self.delete_button.setEnabled(
-            False
-        )
+        layout.addWidget(self.status_label)
 
+        layout.addWidget(self.created_label)
+        layout.addWidget(self.completed_label)
+        layout.addWidget(self.time_label)
+        layout.addWidget(self.dependencies_label)
 
-        self.edit_button.clicked.connect(
-            self.request_edit
-        )
-
-
-        self.complete_button.clicked.connect(
-            self.request_complete
-        )
-
-
-        self.delete_button.clicked.connect(
-            self.request_delete
-        )
-
-
-        layout.addWidget(
-            self.title_label
-        )
-
-
-        layout.addWidget(
-            self.category_label
-        )
-
-
-        layout.addWidget(
-            self.priority_label
-        )
-
-
-        layout.addWidget(
-            self.due_date_label
-        )
-
-
-        layout.addWidget(
-            self.status_label
-        )
-
-
-        layout.addWidget(
-            self.notes_label
-        )
+        layout.addWidget(self.notes_label)
 
 
         layout.addStretch()
 
 
-        layout.addWidget(
-            self.edit_button
-        )
+        layout.addWidget(self.edit_button)
+        layout.addWidget(self.complete_button)
+        layout.addWidget(self.delete_button)
 
 
-        layout.addWidget(
-            self.complete_button
-        )
-
-
-        layout.addWidget(
-            self.delete_button
-        )
-
-
-        self.setLayout(
-            layout
-        )
+        self.setLayout(layout)
 
 
 
@@ -176,10 +120,7 @@ class TaskDetailWidget(QWidget):
 
         self.current_task = task
 
-
-        self.title_label.setText(
-            task.title
-        )
+        self.title_label.setText(task.title)
 
 
         self.category_label.setText(
@@ -210,26 +151,14 @@ class TaskDetailWidget(QWidget):
 
         if task.completed:
 
-            self.status_label.setText(
-                "Status: ✓ Completed"
-            )
-
-
-            self.complete_button.setText(
-                "↩ Mark Active"
-            )
+            self.status_label.setText("Status: ✓ Completed")
+            self.complete_button.setText("↩ Mark Active")
 
 
         else:
 
-            self.status_label.setText(
-                "Status: Active"
-            )
-
-
-            self.complete_button.setText(
-                "✓ Complete Task"
-            )
+            self.status_label.setText("Status: Active")
+            self.complete_button.setText("✓ Complete Task")
 
         if task.completed and task.completed_date:
 
@@ -239,27 +168,34 @@ class TaskDetailWidget(QWidget):
 
         else:
 
-            self.completed_label.setText(
-                "Completed: —"
-            )
+            self.completed_label.setText("Completed: —")
 
-        self.edit_button.setEnabled(
-            True
-        )
+        self.edit_button.setEnabled(True)
 
         self.time_label.setText(
             f"Estimated Time: {task.estimated_minutes} min"
         )
 
+        dependency_titles = []
 
-        self.complete_button.setEnabled(
-            True
-        )
+        for dependency_id in task.depends_on:
+            dependency = managers.task_manager.get_task_by_id(dependency_id)
+
+            if dependency:
+                dependency_titles.append(dependency.title)
+
+        if dependency_titles:
+            self.dependencies_label.setText(
+                "Depends On:\n• " + "\n• ".join(dependency_titles)
+            )
+        else:
+            self.dependencies_label.setText(
+                "Depends On: None"
+            )
 
 
-        self.delete_button.setEnabled(
-            True
-        )
+        self.complete_button.setEnabled(True)
+        self.delete_button.setEnabled(True)
 
 
 
@@ -270,49 +206,22 @@ class TaskDetailWidget(QWidget):
         self.current_task = None
 
 
-        self.title_label.setText(
-            "Select a task"
-        )
+        self.title_label.setText("Select a task")
 
 
-        self.category_label.setText(
-            ""
-        )
+        self.category_label.setText("")
+        self.priority_label.setText("")
+
+        self.due_date_label.setText("")
+
+        self.status_label.setText("")
+        self.dependencies_label.setText("")
+        self.notes_label.setText("")
 
 
-        self.priority_label.setText(
-            ""
-        )
-
-
-        self.due_date_label.setText(
-            ""
-        )
-
-
-        self.status_label.setText(
-            ""
-        )
-
-
-        self.notes_label.setText(
-            ""
-        )
-
-
-        self.edit_button.setEnabled(
-            False
-        )
-
-
-        self.complete_button.setEnabled(
-            False
-        )
-
-
-        self.delete_button.setEnabled(
-            False
-        )
+        self.edit_button.setEnabled(False)
+        self.complete_button.setEnabled(False)
+        self.delete_button.setEnabled(False)
 
         self.created_label.setText("")
         self.completed_label.setText("")

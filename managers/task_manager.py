@@ -166,6 +166,15 @@ class TaskManager(QObject):
 
         if task:
 
+            for dependency_id in depends_on or []:
+
+                if self.creates_circular_dependency(
+                    task_id,
+                    dependency_id
+                ):
+
+                    return False
+
             task.title = new_title.strip()
             task.priority = priority
             task.category = category
@@ -182,6 +191,8 @@ class TaskManager(QObject):
             self.save_tasks()
 
             self.tasks_updated.emit()
+
+            return True
 
 
     def can_complete_task(
@@ -315,6 +326,38 @@ class TaskManager(QObject):
         self.save_tasks()
 
         self.tasks_updated.emit()
+
+    def creates_circular_dependency(
+        self,
+        task_id,
+        dependency_id
+    ):
+
+        visited = set()
+
+        def has_path(current_id):
+
+            if current_id == task_id:
+                return True
+
+            if current_id in visited:
+                return False
+
+            visited.add(current_id)
+
+            current_task = self.get_task_by_id(current_id)
+
+            if current_task is None:
+                return False
+
+            for dep in current_task.depends_on:
+
+                if has_path(dep):
+                    return True
+
+            return False
+
+        return has_path(dependency_id)
 
     def task_is_available(
         self,

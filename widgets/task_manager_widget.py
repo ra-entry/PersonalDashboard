@@ -646,6 +646,22 @@ class TaskManagerWidget(QWidget):
             ) = dialog.get_task_data()
 
 
+        for dependency_id in depends_on:
+
+            if managers.task_manager.creates_circular_dependency(
+                task.id,
+                dependency_id
+            ):
+
+                QMessageBox.warning(
+                    self,
+                    "Circular Dependency",
+                    "That dependency would create a circular dependency."
+                )
+
+                return
+
+
             managers.task_manager.update_task(
                 task.id,
                 new_title,
